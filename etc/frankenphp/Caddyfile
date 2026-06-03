@@ -1,0 +1,22 @@
+{
+    admin 0.0.0.0:2019
+    frankenphp {
+        worker /srv/app/public/index.php 5
+    }
+    debug
+    frankenphp run
+}
+
+:{$PORT} {
+    root * /srv/app/public
+    encode zstd gzip
+    php_server {
+        resolve_root_symlink
+        index index.php
+    }
+    log {
+        output stdout
+        format console
+        level DEBUG
+    }
+}

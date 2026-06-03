@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                                      https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VgarciaChallenge\Vending\Domain\Product\Product" table="products">
+        <unique-constraints>
+            <unique-constraint name="uniq_products_selector" columns="selector"/>
+        </unique-constraints>
+
+        <id name="productId" type="product_id" column="id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="name" type="product_name" column="name" length="120"/>
+        <field name="selector" type="product_selector" column="selector" length="20"/>
+        <field name="price" type="product_price" column="price_cents"/>
+        <field name="stockQuantity" type="product_stock_quantity" column="stock_quantity"/>
+    </entity>
+</doctrine-mapping>

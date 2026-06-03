@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                                      https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VgarciaChallenge\Vending\Domain\VendingMachine\VendingMachine" table="vending_machines">
+        <id name="vendingMachineId" type="vending_machine_id" column="id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="insertedMoney" type="money" column="inserted_money"/>
+        <field name="availableChange" type="money" column="available_change"/>
+        <field name="productInventory" type="product_inventory" column="product_inventory"/>
+        <field name="createdAt" type="datetime_immutable" column="created_at"/>
+        <field name="updatedAt" type="datetime_immutable" column="updated_at"/>
+    </entity>
+</doctrine-mapping>

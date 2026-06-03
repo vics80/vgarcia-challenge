@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                                      https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\VgarciaChallenge\Vending\Domain\Order\Order" table="orders">
+        <indexes>
+            <index name="idx_orders_vending_machine_id" columns="vending_machine_id"/>
+            <index name="idx_orders_product_selector" columns="product_selector"/>
+        </indexes>
+
+        <id name="orderId" type="order_id" column="id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="vendingMachineId" type="vending_machine_id" column="vending_machine_id"/>
+        <field name="productSelector" type="product_selector" column="product_selector" length="20"/>
+        <field name="totalAmount" type="order_total_amount" column="total_amount_cents"/>
+        <field name="createdAt" type="datetime_immutable" column="created_at"/>
+        <field name="updatedAt" type="datetime_immutable" column="updated_at"/>
+    </entity>
+</doctrine-mapping>
