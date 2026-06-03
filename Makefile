@@ -1,4 +1,4 @@
-.PHONY: help install up down restart logs shell composer-install composer-dump-autoload test test-one migrate migration-diff schema-validate console
+.PHONY: help install up down restart logs shell composer-install composer-dump-autoload setup fixtures-load test test-one migrate migration-diff schema-validate console
 
 DOCKER_COMPOSE := docker compose -f docker-compose.yaml
 APP_CONTAINER := vgarcia-challenge
@@ -31,6 +31,11 @@ composer-install: ## Install Composer dependencies inside the app container
 
 composer-dump-autoload: ## Regenerate Composer autoload files
 	$(DOCKER_EXEC) composer dump-autoload
+
+setup: migrate fixtures-load ## Run migrations and load initial vending machine data
+
+fixtures-load: ## Load Doctrine fixtures
+	$(CONSOLE) doctrine:fixtures:load --no-interaction
 
 test: ## Run the PHPUnit test suite
 	$(DOCKER_EXEC) php vendor/bin/phpunit --colors=always

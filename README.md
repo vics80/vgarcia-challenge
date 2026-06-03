@@ -37,6 +37,14 @@ Run migrations with:
 make migrate
 ```
 
+Create the initial vending machine and known products with:
+
+```bash
+make setup
+```
+
+This runs migrations and reloads Doctrine fixtures, so mapped tables are purged before inserting the seed data.
+
 Generate a new migration after mapping changes with:
 
 ```bash
@@ -72,6 +80,7 @@ make test-one TEST=src/VgarciaChallenge/Vending/tests/Domain/Money/MoneyTest.php
 - `make shell`: open a shell in the PHP container.
 - `make composer-install`: install Composer dependencies.
 - `make composer-dump-autoload`: regenerate autoload files.
+- `make setup`: run migrations and load initial vending machine data.
 - `make test`: run tests.
 - `make migrate`: run Doctrine migrations.
 - `make migration-diff`: generate a Doctrine migration.
