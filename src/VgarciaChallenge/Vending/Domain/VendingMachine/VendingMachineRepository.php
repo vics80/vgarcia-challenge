@@ -9,4 +9,6 @@ interface VendingMachineRepository
     public function save(VendingMachine $vendingMachine): void;
 
     public function find(VendingMachineId $vendingMachineId): ?VendingMachine;
+
+    public function findFirst(): ?VendingMachine;
 }

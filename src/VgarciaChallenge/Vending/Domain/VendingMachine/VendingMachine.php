@@ -6,8 +6,10 @@ namespace App\VgarciaChallenge\Vending\Domain\VendingMachine;
 
 use App\VgarciaChallenge\Shared\Domain\AggregateRoot;
 use App\VgarciaChallenge\Shared\Domain\Timestampable;
+use App\VgarciaChallenge\Vending\Domain\Money\Coin;
 use App\VgarciaChallenge\Vending\Domain\Money\Money;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductInventory;
+use App\VgarciaChallenge\Vending\Domain\VendingMachine\Event\CoinWasAdded;
 use DateTimeInterface;
 
 class VendingMachine extends AggregateRoot
@@ -76,5 +78,17 @@ class VendingMachine extends AggregateRoot
     public function productInventory(): ProductInventory
     {
         return $this->productInventory;
+    }
+
+    public function insertCoin(Coin $coin): void
+    {
+        $this->insertedMoney = $this->insertedMoney->addCoin($coin);
+        $this->touch();
+
+        $this->recordDomainEvent(new CoinWasAdded(
+            $this->vendingMachineId->value(),
+            $coin->cents(),
+            $this->insertedMoney->totalCents(),
+        ));
     }
 }

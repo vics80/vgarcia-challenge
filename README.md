@@ -59,6 +59,12 @@ make schema-validate
 
 ## Tests
 
+Insert a coin through the Symfony console command with:
+
+```bash
+make insert-coin COIN=0.25
+```
+
 Run the full PHPUnit suite with:
 
 ```bash
@@ -81,6 +87,7 @@ make test-one TEST=src/VgarciaChallenge/Vending/tests/Domain/Money/MoneyTest.php
 - `make composer-install`: install Composer dependencies.
 - `make composer-dump-autoload`: regenerate autoload files.
 - `make setup`: run migrations and load initial vending machine data.
+- `make insert-coin COIN=0.25`: insert a coin into the vending machine.
 - `make test`: run tests.
 - `make migrate`: run Doctrine migrations.
 - `make migration-diff`: generate a Doctrine migration.

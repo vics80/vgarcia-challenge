@@ -83,6 +83,22 @@ final class Money
         return $this->coinQuantities[$coin->cents()] ?? 0;
     }
 
+    public function addCoin(Coin $coin): self
+    {
+        return $this->add(self::fromCoins($coin));
+    }
+
+    public function add(self $money): self
+    {
+        $coinQuantities = $this->coinQuantities;
+
+        foreach ($money->coinQuantities as $coinCents => $quantity) {
+            $coinQuantities[$coinCents] = ($coinQuantities[$coinCents] ?? 0) + $quantity;
+        }
+
+        return new self($coinQuantities);
+    }
+
     /** @return list<array{coinCents:int,quantity:int}> */
     public function toPrimitives(): array
     {

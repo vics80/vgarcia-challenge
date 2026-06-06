@@ -1,11 +1,12 @@
-.PHONY: help install up down restart logs shell composer-install composer-dump-autoload setup fixtures-load test test-one migrate migration-diff schema-validate console
+.PHONY: help install up down restart logs shell composer-install composer-dump-autoload setup fixtures-load insert-coin test test-one migrate migration-diff schema-validate console
 
 DOCKER_COMPOSE := docker compose -f docker-compose.yaml
 APP_CONTAINER := vgarcia-challenge
 WORKDIR := /srv/app
 DOCKER_EXEC := docker exec -w $(WORKDIR) $(APP_CONTAINER)
+DOCKER_EXEC_CONSOLE := docker exec -e FORCE_COLOR=1 -w $(WORKDIR) $(APP_CONTAINER)
 DOCKER_EXEC_IT := docker exec -it -w $(WORKDIR) $(APP_CONTAINER)
-CONSOLE := $(DOCKER_EXEC) php bin/console
+CONSOLE := $(DOCKER_EXEC_CONSOLE) php bin/console
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "%-20s %s\n", $$1, $$2}'
@@ -36,6 +37,10 @@ setup: migrate fixtures-load ## Run migrations and load initial vending machine 
 
 fixtures-load: ## Load Doctrine fixtures
 	$(CONSOLE) doctrine:fixtures:load --no-interaction
+
+insert-coin: ## Insert a coin, for example make insert-coin COIN=0.25
+	@test -n "$(COIN)" || (echo "Set COIN=0.05, 0.10, 0.25 or 1.00" && exit 1)
+	@$(CONSOLE) vending:insert-coin $(COIN)
 
 test: ## Run the PHPUnit test suite
 	$(DOCKER_EXEC) php vendor/bin/phpunit --colors=always

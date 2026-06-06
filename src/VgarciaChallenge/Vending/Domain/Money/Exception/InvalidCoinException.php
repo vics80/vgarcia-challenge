@@ -14,4 +14,9 @@ final class InvalidCoinException extends DomainException
     {
         return new self(sprintf('Coin [%d] is not accepted by this vending machine.', $coinCents));
     }
+
+    public static function fromDecimalValue(string $coin): self
+    {
+        return new self(sprintf('Coin [%s] is not accepted by this vending machine.', $coin));
+    }
 }
