@@ -1,4 +1,4 @@
-.PHONY: help install up down restart logs shell composer-install composer-dump-autoload setup fixtures-load insert-coin test test-one test-coverage migrate migration-diff schema-validate console
+.PHONY: help install up down restart logs shell composer-install composer-dump-autoload setup fixtures-load insert-coin return-coins test test-one test-coverage migrate migration-diff schema-validate console
 
 DOCKER_COMPOSE := docker compose -f docker-compose.yaml
 APP_CONTAINER := vgarcia-challenge
@@ -43,6 +43,9 @@ fixtures-load: ## Load Doctrine fixtures
 insert-coin: ## Insert a coin, for example make insert-coin COIN=0.25
 	@test -n "$(COIN)" || (echo "Set COIN=0.05, 0.10, 0.25 or 1.00" && exit 1)
 	@$(CONSOLE) vending:insert-coin $(COIN)
+
+return-coins: ## Return the inserted coins
+	@$(CONSOLE) vending:return-coins
 
 test: ## Run the PHPUnit test suite
 	$(DOCKER_EXEC) php vendor/bin/phpunit --colors=always

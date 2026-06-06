@@ -65,6 +65,12 @@ Insert a coin through the Symfony console command with:
 make insert-coin COIN=0.25
 ```
 
+Return the inserted coins with:
+
+```bash
+make return-coins
+```
+
 Run the full PHPUnit suite with:
 
 ```bash
@@ -96,6 +102,7 @@ make test-one TEST=src/VgarciaChallenge/Vending/tests/Domain/Money/MoneyTest.php
 - `make composer-dump-autoload`: regenerate autoload files.
 - `make setup`: run migrations and load initial vending machine data.
 - `make insert-coin COIN=0.25`: insert a coin into the vending machine.
+- `make return-coins`: return the inserted coins from the vending machine.
 - `make test`: run tests.
 - `make test-coverage`: run tests and generate the HTML coverage report.
 - `make migrate`: run Doctrine migrations.

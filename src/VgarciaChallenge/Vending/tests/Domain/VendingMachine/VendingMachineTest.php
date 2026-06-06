@@ -8,6 +8,7 @@ use App\VgarciaChallenge\Vending\Domain\Money\Coin;
 use App\VgarciaChallenge\Vending\Domain\Money\Money;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductInventory;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\Event\CoinWasAdded;
+use App\VgarciaChallenge\Vending\Domain\VendingMachine\Exception\CoinsNotFoundException;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\VendingMachine;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\VendingMachineId;
 use DateTimeImmutable;
@@ -105,5 +106,56 @@ final class VendingMachineTest extends TestCase
         $vendingMachine->insertCoin(Coin::FIVE_CENTS);
 
         self::assertNotSame($updatedAt, $vendingMachine->updatedAt());
+    }
+
+    public function testReturnsInsertedMoneyAndClearsInsertedCoins(): void
+    {
+        $vendingMachine = VendingMachine::create(
+            VendingMachineId::random(),
+            Money::fromCoins(Coin::ONE_EURO),
+            ProductInventory::empty(),
+        );
+        $vendingMachine->insertCoin(Coin::FIVE_CENTS);
+        $vendingMachine->insertCoin(Coin::FIVE_CENTS);
+        $vendingMachine->insertCoin(Coin::TWENTY_FIVE_CENTS);
+
+        $returnedMoney = $vendingMachine->returnInsertedMoney();
+
+        self::assertSame(35, $returnedMoney->totalCents());
+        self::assertSame(2, $returnedMoney->quantityOf(Coin::FIVE_CENTS));
+        self::assertSame(1, $returnedMoney->quantityOf(Coin::TWENTY_FIVE_CENTS));
+        self::assertSame(0, $vendingMachine->insertedMoney()->totalCents());
+        self::assertSame(100, $vendingMachine->availableChange()->totalCents());
+    }
+
+    public function testReturnInsertedMoneyTouchesUpdatedAt(): void
+    {
+        $updatedAt = new DateTimeImmutable('2026-01-01 10:00:00');
+        $vendingMachine = VendingMachine::reconstitute(
+            VendingMachineId::random(),
+            Money::fromCoins(Coin::TEN_CENTS),
+            Money::empty(),
+            ProductInventory::empty(),
+            new DateTimeImmutable('2026-01-01 09:00:00'),
+            $updatedAt,
+        );
+
+        $vendingMachine->returnInsertedMoney();
+
+        self::assertNotSame($updatedAt, $vendingMachine->updatedAt());
+    }
+
+    public function testFailsWhenThereAreNoInsertedCoinsToReturn(): void
+    {
+        $vendingMachine = VendingMachine::create(
+            VendingMachineId::random(),
+            Money::empty(),
+            ProductInventory::empty(),
+        );
+
+        $this->expectException(CoinsNotFoundException::class);
+        $this->expectExceptionMessage('No inserted coins were found to return.');
+
+        $vendingMachine->returnInsertedMoney();
     }
 }

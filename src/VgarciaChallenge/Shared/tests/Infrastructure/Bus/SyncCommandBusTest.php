@@ -18,9 +18,10 @@ final class SyncCommandBusTest extends TestCase
         $handler = new TestCommandHandler();
         $commandBus = new SyncCommandBus([$handler]);
 
-        $commandBus->dispatch(new TestCommand());
+        $result = $commandBus->dispatch(new TestCommand());
 
         self::assertTrue($handler->wasCalled);
+        self::assertSame('handled', $result);
     }
 
     public function testFailsWhenCommandHasNoHandler(): void
@@ -48,9 +49,11 @@ final class TestCommandHandler implements CommandHandler
 {
     public bool $wasCalled = false;
 
-    public function __invoke(TestCommand $command): void
+    public function __invoke(TestCommand $command): string
     {
         $this->wasCalled = true;
+
+        return 'handled';
     }
 
     public function handles(): string

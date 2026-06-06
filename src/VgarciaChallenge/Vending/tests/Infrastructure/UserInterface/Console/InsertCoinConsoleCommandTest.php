@@ -31,8 +31,10 @@ final class TestCommandBus implements CommandBus
 {
     public ?Command $dispatchedCommand = null;
 
-    public function dispatch(Command $command): void
+    public function dispatch(Command $command): mixed
     {
         $this->dispatchedCommand = $command;
+
+        return null;
     }
 }

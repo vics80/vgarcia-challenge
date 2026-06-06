@@ -29,7 +29,7 @@ final class SyncCommandBus implements CommandBus
         }
     }
 
-    public function dispatch(Command $command): void
+    public function dispatch(Command $command): mixed
     {
         $handler = $this->handlers[$command::class] ?? null;
 
@@ -37,6 +37,6 @@ final class SyncCommandBus implements CommandBus
             throw CommandHandlerNotFoundException::forCommand($command);
         }
 
-        $handler($command);
+        return $handler($command);
     }
 }

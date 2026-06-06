@@ -10,6 +10,7 @@ use App\VgarciaChallenge\Vending\Domain\Money\Coin;
 use App\VgarciaChallenge\Vending\Domain\Money\Money;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductInventory;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\Event\CoinWasAdded;
+use App\VgarciaChallenge\Vending\Domain\VendingMachine\Exception\CoinsNotFoundException;
 use DateTimeInterface;
 
 class VendingMachine extends AggregateRoot
@@ -90,5 +91,18 @@ class VendingMachine extends AggregateRoot
             $coin->cents(),
             $this->insertedMoney->totalCents(),
         ));
+    }
+
+    public function returnInsertedMoney(): Money
+    {
+        if (0 === $this->insertedMoney->totalCents()) {
+            throw CoinsNotFoundException::becauseNoCoinsWereInserted();
+        }
+
+        $returnedMoney = $this->insertedMoney;
+        $this->insertedMoney = Money::empty();
+        $this->touch();
+
+        return $returnedMoney;
     }
 }
