@@ -71,6 +71,14 @@ Run the full PHPUnit suite with:
 make test
 ```
 
+Run the full PHPUnit suite and generate an HTML coverage report with:
+
+```bash
+make test-coverage
+```
+
+The coverage report is generated at `var/reports/phpunit/coverage/index.html`.
+
 Run a single test file with:
 
 ```bash
@@ -89,6 +97,7 @@ make test-one TEST=src/VgarciaChallenge/Vending/tests/Domain/Money/MoneyTest.php
 - `make setup`: run migrations and load initial vending machine data.
 - `make insert-coin COIN=0.25`: insert a coin into the vending machine.
 - `make test`: run tests.
+- `make test-coverage`: run tests and generate the HTML coverage report.
 - `make migrate`: run Doctrine migrations.
 - `make migration-diff`: generate a Doctrine migration.
 - `make schema-validate`: validate Doctrine mapping and schema.

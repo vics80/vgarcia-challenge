@@ -1,10 +1,12 @@
-.PHONY: help install up down restart logs shell composer-install composer-dump-autoload setup fixtures-load insert-coin test test-one migrate migration-diff schema-validate console
+.PHONY: help install up down restart logs shell composer-install composer-dump-autoload setup fixtures-load insert-coin test test-one test-coverage migrate migration-diff schema-validate console
 
 DOCKER_COMPOSE := docker compose -f docker-compose.yaml
 APP_CONTAINER := vgarcia-challenge
 WORKDIR := /srv/app
+COVERAGE_DIR := var/reports/phpunit/coverage
 DOCKER_EXEC := docker exec -w $(WORKDIR) $(APP_CONTAINER)
 DOCKER_EXEC_CONSOLE := docker exec -e FORCE_COLOR=1 -w $(WORKDIR) $(APP_CONTAINER)
+DOCKER_EXEC_COVERAGE := docker exec -e XDEBUG_MODE=coverage -w $(WORKDIR) $(APP_CONTAINER)
 DOCKER_EXEC_IT := docker exec -it -w $(WORKDIR) $(APP_CONTAINER)
 CONSOLE := $(DOCKER_EXEC_CONSOLE) php bin/console
 
@@ -48,6 +50,10 @@ test: ## Run the PHPUnit test suite
 test-one: ## Run one test file, for example make test-one TEST=src/VgarciaChallenge/Vending/tests/Domain/Money/MoneyTest.php
 	@test -n "$(TEST)" || (echo "Set TEST=path/to/Test.php" && exit 1)
 	$(DOCKER_EXEC) php vendor/bin/phpunit --colors=always $(TEST)
+
+test-coverage: ## Run the PHPUnit test suite with an HTML coverage report
+	$(DOCKER_EXEC_COVERAGE) php vendor/bin/phpunit --colors=always --coverage-html $(COVERAGE_DIR) --coverage-text --only-summary-for-coverage-text
+	@echo "Coverage report generated at $(COVERAGE_DIR)/index.html"
 
 migrate: ## Run Doctrine migrations
 	$(CONSOLE) doctrine:migrations:migrate --no-interaction

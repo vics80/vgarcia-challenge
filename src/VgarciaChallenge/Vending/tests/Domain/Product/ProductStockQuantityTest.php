@@ -23,4 +23,21 @@ final class ProductStockQuantityTest extends TestCase
 
         self::assertSame(0, $stockQuantity->value());
     }
+
+    public function testDecrementsStockQuantity(): void
+    {
+        $stockQuantity = new ProductStockQuantity(3);
+
+        self::assertSame(2, $stockQuantity->decrement()->value());
+        self::assertSame(1, $stockQuantity->decrement(2)->value());
+    }
+
+    public function testFailsWhenDecrementLeavesNegativeStockQuantity(): void
+    {
+        $stockQuantity = new ProductStockQuantity(0);
+
+        $this->expectException(NumberMinMaxException::class);
+
+        $stockQuantity->decrement();
+    }
 }

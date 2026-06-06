@@ -16,6 +16,15 @@ use PHPUnit\Framework\TestCase;
 
 final class ProductInventoryTest extends TestCase
 {
+    public function testCreatesEmptyInventory(): void
+    {
+        $inventory = ProductInventory::empty();
+
+        self::assertFalse($inventory->has(ProductSelector::WATER));
+        self::assertSame([], $inventory->products());
+        self::assertSame([], $inventory->toPrimitives());
+    }
+
     public function testFailsWhenTwoProductsUseSameSelector(): void
     {
         $this->expectException(DuplicateProductSelectorException::class);
@@ -34,6 +43,31 @@ final class ProductInventoryTest extends TestCase
         self::assertTrue($inventory->has(ProductSelector::WATER));
         self::assertSame($water, $inventory->find(ProductSelector::WATER));
         self::assertNull($inventory->find(ProductSelector::SODA));
+    }
+
+    public function testCreatesFromPrimitivesAndExportsToPrimitives(): void
+    {
+        $payload = [
+            [
+                'productId' => '018f47d2-7c6a-7caa-b9d4-8b22f1c6d101',
+                'name' => 'Water',
+                'selector' => 'WATER',
+                'priceCents' => 65,
+                'stockQuantity' => 10,
+            ],
+            [
+                'productId' => '018f47d2-7c6a-7caa-b9d4-8b22f1c6d102',
+                'name' => 'Juice',
+                'selector' => 'JUICE',
+                'priceCents' => 100,
+                'stockQuantity' => 9,
+            ],
+        ];
+
+        $inventory = ProductInventory::fromPrimitives($payload);
+
+        self::assertCount(2, $inventory->products());
+        self::assertSame($payload, $inventory->toPrimitives());
     }
 
     private function product(ProductSelector $selector): Product

@@ -7,6 +7,7 @@ namespace App\Tests\VgarciaChallenge\Shared\Infrastructure\Bus;
 use App\VgarciaChallenge\Shared\Application\Command\Command;
 use App\VgarciaChallenge\Shared\Application\Command\CommandHandler;
 use App\VgarciaChallenge\Shared\Application\Command\Exception\CommandHandlerNotFoundException;
+use App\VgarciaChallenge\Shared\Application\Command\Exception\InvalidCommandHandlerException;
 use App\VgarciaChallenge\Shared\Infrastructure\Bus\SyncCommandBus;
 use PHPUnit\Framework\TestCase;
 
@@ -30,6 +31,13 @@ final class SyncCommandBusTest extends TestCase
 
         $commandBus->dispatch(new TestCommand());
     }
+
+    public function testFailsWhenCommandHandlerIsNotCallable(): void
+    {
+        $this->expectException(InvalidCommandHandlerException::class);
+
+        new SyncCommandBus([new InvalidTestCommandHandler()]);
+    }
 }
 
 final class TestCommand implements Command
@@ -45,6 +53,14 @@ final class TestCommandHandler implements CommandHandler
         $this->wasCalled = true;
     }
 
+    public function handles(): string
+    {
+        return TestCommand::class;
+    }
+}
+
+final class InvalidTestCommandHandler implements CommandHandler
+{
     public function handles(): string
     {
         return TestCommand::class;

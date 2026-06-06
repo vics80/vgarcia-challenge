@@ -40,6 +40,13 @@ final class InsertCoinCommandHandlerTest extends TestCase
         (new InsertCoinCommandHandler($repository))(new InsertCoinCommand('0.25'));
     }
 
+    public function testHandlesInsertCoinCommand(): void
+    {
+        $repository = $this->createMock(VendingMachineRepository::class);
+
+        self::assertSame(InsertCoinCommand::class, (new InsertCoinCommandHandler($repository))->handles());
+    }
+
     public function testFailsWhenThereIsNoVendingMachine(): void
     {
         $repository = $this->createMock(VendingMachineRepository::class);
