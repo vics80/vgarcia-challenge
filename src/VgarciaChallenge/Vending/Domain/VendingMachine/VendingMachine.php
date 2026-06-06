@@ -8,8 +8,12 @@ use App\VgarciaChallenge\Shared\Domain\AggregateRoot;
 use App\VgarciaChallenge\Shared\Domain\Timestampable;
 use App\VgarciaChallenge\Vending\Domain\Money\Coin;
 use App\VgarciaChallenge\Vending\Domain\Money\Money;
+use App\VgarciaChallenge\Vending\Domain\Product\Exception\ProductNotFoundException;
+use App\VgarciaChallenge\Vending\Domain\Product\Product;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductInventory;
+use App\VgarciaChallenge\Vending\Domain\Product\ProductSelector;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\Event\CoinWasAdded;
+use App\VgarciaChallenge\Vending\Domain\VendingMachine\Event\ProductWasPurchased;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\Exception\CoinsNotFoundException;
 use DateTimeInterface;
 
@@ -84,6 +88,7 @@ class VendingMachine extends AggregateRoot
     public function insertCoin(Coin $coin): void
     {
         $this->insertedMoney = $this->insertedMoney->addCoin($coin);
+        $this->availableChange = $this->availableChange->addCoin($coin);
         $this->touch();
 
         $this->recordDomainEvent(new CoinWasAdded(
@@ -101,8 +106,39 @@ class VendingMachine extends AggregateRoot
 
         $returnedMoney = $this->insertedMoney;
         $this->insertedMoney = Money::empty();
+        $this->availableChange = $this->availableChange->subtract($returnedMoney);
         $this->touch();
 
         return $returnedMoney;
+    }
+
+    public function purchaseProduct(Product $product): void
+    {
+        $this->recordDomainEvent(new ProductWasPurchased(
+            $this->vendingMachineId->value(),
+            $product->productId()->value(),
+            $product->selector()->value,
+            $product->price()->cents(),
+        ));
+    }
+
+    public function decrementProductStock(ProductSelector $selector): void
+    {
+        $product = $this->productInventory->find($selector);
+
+        if (null === $product) {
+            throw ProductNotFoundException::forSelector($selector->value);
+        }
+
+        $product->decrementStock();
+        $this->productInventory = ProductInventory::fromPrimitives($this->productInventory->toPrimitives());
+        $this->touch();
+    }
+
+    public function returnChangeAndClearInsertedMoney(Money $returnedChange): void
+    {
+        $this->availableChange = $this->availableChange->subtract($returnedChange);
+        $this->insertedMoney = Money::empty();
+        $this->touch();
     }
 }

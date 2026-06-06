@@ -23,7 +23,7 @@ final class ReturnCoinsCommandHandlerTest extends TestCase
         $vendingMachine = VendingMachine::reconstitute(
             VendingMachineId::random(),
             Money::fromCoins(Coin::FIVE_CENTS, Coin::FIVE_CENTS, Coin::TWENTY_FIVE_CENTS),
-            Money::empty(),
+            Money::fromCoins(Coin::FIVE_CENTS, Coin::FIVE_CENTS, Coin::TWENTY_FIVE_CENTS),
             ProductInventory::empty(),
         );
         $repository = $this->createMock(VendingMachineRepository::class);
@@ -35,7 +35,8 @@ final class ReturnCoinsCommandHandlerTest extends TestCase
             ->expects(self::once())
             ->method('save')
             ->with(self::callback(static function (VendingMachine $savedVendingMachine): bool {
-                return 0 === $savedVendingMachine->insertedMoney()->totalCents();
+                return 0 === $savedVendingMachine->insertedMoney()->totalCents()
+                    && 0 === $savedVendingMachine->availableChange()->totalCents();
             }));
 
         $returnedMoney = (new ReturnCoinsCommandHandler($repository))(new ReturnCoinsCommand());

@@ -71,6 +71,12 @@ Return the inserted coins with:
 make return-coins
 ```
 
+Select a product with:
+
+```bash
+make select-product SELECTOR=WATER
+```
+
 Run the full PHPUnit suite with:
 
 ```bash
@@ -103,6 +109,7 @@ make test-one TEST=src/VgarciaChallenge/Vending/tests/Domain/Money/MoneyTest.php
 - `make setup`: run migrations and load initial vending machine data.
 - `make insert-coin COIN=0.25`: insert a coin into the vending machine.
 - `make return-coins`: return the inserted coins from the vending machine.
+- `make select-product SELECTOR=WATER`: select a product from the vending machine.
 - `make test`: run tests.
 - `make test-coverage`: run tests and generate the HTML coverage report.
 - `make migrate`: run Doctrine migrations.

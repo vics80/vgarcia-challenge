@@ -6,8 +6,14 @@ namespace App\Tests\VgarciaChallenge\Vending\Domain\VendingMachine;
 
 use App\VgarciaChallenge\Vending\Domain\Money\Coin;
 use App\VgarciaChallenge\Vending\Domain\Money\Money;
+use App\VgarciaChallenge\Vending\Domain\Product\Exception\ProductNotFoundException;
+use App\VgarciaChallenge\Vending\Domain\Product\Product;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductInventory;
+use App\VgarciaChallenge\Vending\Domain\Product\ProductId;
+use App\VgarciaChallenge\Vending\Domain\Product\ProductSelector;
+use App\VgarciaChallenge\Vending\Domain\Product\ProductStockQuantity;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\Event\CoinWasAdded;
+use App\VgarciaChallenge\Vending\Domain\VendingMachine\Event\ProductWasPurchased;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\Exception\CoinsNotFoundException;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\VendingMachine;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\VendingMachineId;
@@ -53,7 +59,7 @@ final class VendingMachineTest extends TestCase
         self::assertSame($updatedAt, $vendingMachine->updatedAt());
     }
 
-    public function testInsertCoinAddsCoinToInsertedMoneyOnly(): void
+    public function testInsertCoinAddsCoinToInsertedMoneyAndAvailableChange(): void
     {
         $availableChange = Money::fromCoinQuantities([
             Coin::FIVE_CENTS->cents() => 10,
@@ -68,7 +74,7 @@ final class VendingMachineTest extends TestCase
         $vendingMachine->insertCoin(Coin::TWENTY_FIVE_CENTS);
 
         self::assertSame(25, $vendingMachine->insertedMoney()->totalCents());
-        self::assertSame(150, $vendingMachine->availableChange()->totalCents());
+        self::assertSame(175, $vendingMachine->availableChange()->totalCents());
     }
 
     public function testInsertCoinRecordsDomainEvent(): void
@@ -134,7 +140,7 @@ final class VendingMachineTest extends TestCase
         $vendingMachine = VendingMachine::reconstitute(
             VendingMachineId::random(),
             Money::fromCoins(Coin::TEN_CENTS),
-            Money::empty(),
+            Money::fromCoins(Coin::TEN_CENTS),
             ProductInventory::empty(),
             new DateTimeImmutable('2026-01-01 09:00:00'),
             $updatedAt,
@@ -157,5 +163,85 @@ final class VendingMachineTest extends TestCase
         $this->expectExceptionMessage('No inserted coins were found to return.');
 
         $vendingMachine->returnInsertedMoney();
+    }
+
+    public function testPurchaseProductRecordsDomainEvent(): void
+    {
+        $product = $this->product(ProductSelector::WATER, 10);
+        $vendingMachine = VendingMachine::create(
+            VendingMachineId::random(),
+            Money::empty(),
+            ProductInventory::fromProducts($product),
+        );
+
+        $vendingMachine->purchaseProduct($product);
+
+        $events = $vendingMachine->pullDomainEvents();
+
+        self::assertCount(1, $events);
+        self::assertInstanceOf(ProductWasPurchased::class, $events[0]);
+        self::assertSame($vendingMachine->vendingMachineId()->value(), $events[0]->aggregateId());
+        self::assertSame($product->productId()->value(), $events[0]->productId());
+        self::assertSame('WATER', $events[0]->productSelector());
+        self::assertSame(65, $events[0]->productPriceCents());
+    }
+
+    public function testDecrementsProductStock(): void
+    {
+        $product = $this->product(ProductSelector::WATER, 2);
+        $vendingMachine = VendingMachine::create(
+            VendingMachineId::random(),
+            Money::empty(),
+            ProductInventory::fromProducts($product),
+        );
+        $initialInventory = $vendingMachine->productInventory();
+
+        $vendingMachine->decrementProductStock(ProductSelector::WATER);
+
+        self::assertSame(1, $product->stockQuantity()->value());
+        self::assertNotSame($initialInventory, $vendingMachine->productInventory());
+        self::assertSame(1, $vendingMachine->productInventory()->find(ProductSelector::WATER)?->stockQuantity()->value());
+    }
+
+    public function testFailsWhenDecrementingMissingProductStock(): void
+    {
+        $vendingMachine = VendingMachine::create(
+            VendingMachineId::random(),
+            Money::empty(),
+            ProductInventory::empty(),
+        );
+
+        $this->expectException(ProductNotFoundException::class);
+
+        $vendingMachine->decrementProductStock(ProductSelector::WATER);
+    }
+
+    public function testReturnsChangeAndClearsInsertedMoney(): void
+    {
+        $vendingMachine = VendingMachine::reconstitute(
+            VendingMachineId::random(),
+            Money::fromCoins(Coin::ONE_EURO),
+            Money::fromCoins(Coin::ONE_EURO, Coin::TWENTY_FIVE_CENTS, Coin::TEN_CENTS),
+            ProductInventory::empty(),
+        );
+
+        $vendingMachine->returnChangeAndClearInsertedMoney(Money::fromCoins(
+            Coin::TWENTY_FIVE_CENTS,
+            Coin::TEN_CENTS,
+        ));
+
+        self::assertSame(0, $vendingMachine->insertedMoney()->totalCents());
+        self::assertSame(100, $vendingMachine->availableChange()->totalCents());
+    }
+
+    private function product(ProductSelector $selector, int $stockQuantity): Product
+    {
+        return Product::create(
+            ProductId::random(),
+            $selector->defaultName(),
+            $selector,
+            $selector->defaultPrice(),
+            new ProductStockQuantity($stockQuantity),
+        );
     }
 }

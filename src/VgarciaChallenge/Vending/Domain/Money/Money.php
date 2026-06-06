@@ -83,6 +83,11 @@ final class Money
         return $this->coinQuantities[$coin->cents()] ?? 0;
     }
 
+    public function isEmpty(): bool
+    {
+        return 0 === $this->totalCents();
+    }
+
     public function addCoin(Coin $coin): self
     {
         return $this->add(self::fromCoins($coin));
@@ -94,6 +99,17 @@ final class Money
 
         foreach ($money->coinQuantities as $coinCents => $quantity) {
             $coinQuantities[$coinCents] = ($coinQuantities[$coinCents] ?? 0) + $quantity;
+        }
+
+        return new self($coinQuantities);
+    }
+
+    public function subtract(self $money): self
+    {
+        $coinQuantities = $this->coinQuantities;
+
+        foreach ($money->coinQuantities as $coinCents => $quantity) {
+            $coinQuantities[$coinCents] = ($coinQuantities[$coinCents] ?? 0) - $quantity;
         }
 
         return new self($coinQuantities);

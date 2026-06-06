@@ -34,7 +34,7 @@ final class InsertCoinCommandHandlerTest extends TestCase
             ->method('save')
             ->with(self::callback(static function (VendingMachine $savedVendingMachine): bool {
                 return 25 === $savedVendingMachine->insertedMoney()->totalCents()
-                    && 0 === $savedVendingMachine->availableChange()->totalCents();
+                    && 25 === $savedVendingMachine->availableChange()->totalCents();
             }));
 
         (new InsertCoinCommandHandler($repository))(new InsertCoinCommand('0.25'));

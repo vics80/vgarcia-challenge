@@ -1,4 +1,4 @@
-.PHONY: help install up down restart logs shell composer-install composer-dump-autoload setup fixtures-load insert-coin return-coins test test-one test-coverage migrate migration-diff schema-validate console
+.PHONY: help install up down restart logs shell composer-install composer-dump-autoload setup fixtures-load insert-coin return-coins select-product test test-one test-coverage migrate migration-diff schema-validate console
 
 DOCKER_COMPOSE := docker compose -f docker-compose.yaml
 APP_CONTAINER := vgarcia-challenge
@@ -46,6 +46,10 @@ insert-coin: ## Insert a coin, for example make insert-coin COIN=0.25
 
 return-coins: ## Return the inserted coins
 	@$(CONSOLE) vending:return-coins
+
+select-product: ## Select a product, for example make select-product SELECTOR=WATER
+	@test -n "$(SELECTOR)" || (echo "Set SELECTOR=WATER, JUICE or SODA" && exit 1)
+	@$(CONSOLE) vending:select-product $(SELECTOR)
 
 test: ## Run the PHPUnit test suite
 	$(DOCKER_EXEC) php vendor/bin/phpunit --colors=always

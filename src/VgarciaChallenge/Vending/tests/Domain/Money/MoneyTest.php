@@ -16,6 +16,7 @@ final class MoneyTest extends TestCase
     {
         $money = Money::empty();
 
+        self::assertTrue($money->isEmpty());
         self::assertSame(0, $money->totalCents());
         self::assertSame('0.00', $money->decimalString());
         self::assertSame(0, $money->quantityOf(Coin::FIVE_CENTS));
@@ -66,6 +67,30 @@ final class MoneyTest extends TestCase
         self::assertSame(1, $result->quantityOf(Coin::FIVE_CENTS));
         self::assertSame(2, $result->quantityOf(Coin::TEN_CENTS));
         self::assertSame(1, $result->quantityOf(Coin::TWENTY_FIVE_CENTS));
+    }
+
+    public function testSubtractsMoneyByCoinQuantity(): void
+    {
+        $money = Money::fromCoins(
+            Coin::FIVE_CENTS,
+            Coin::FIVE_CENTS,
+            Coin::TWENTY_FIVE_CENTS,
+            Coin::ONE_EURO,
+        );
+
+        $result = $money->subtract(Money::fromCoins(Coin::FIVE_CENTS, Coin::TWENTY_FIVE_CENTS));
+
+        self::assertFalse($result->isEmpty());
+        self::assertSame(105, $result->totalCents());
+        self::assertSame(1, $result->quantityOf(Coin::FIVE_CENTS));
+        self::assertSame(0, $result->quantityOf(Coin::TWENTY_FIVE_CENTS));
+    }
+
+    public function testFailsWhenSubtractionLeavesNegativeCoinQuantity(): void
+    {
+        $this->expectException(InvalidCoinQuantityException::class);
+
+        Money::empty()->subtract(Money::fromCoins(Coin::FIVE_CENTS));
     }
 
     public function testFailsWhenMoneyContainsUnsupportedCoin(): void
