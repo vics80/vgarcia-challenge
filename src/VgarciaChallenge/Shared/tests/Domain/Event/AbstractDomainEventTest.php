@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\VgarciaChallenge\Shared\Domain\Event;
 
-use App\VgarciaChallenge\Shared\Domain\Event\AbstractDomainEvent;
+use App\Tests\VgarciaChallenge\Shared\Support\Domain\Event\TestDomainEvent;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -31,8 +31,4 @@ final class AbstractDomainEventTest extends TestCase
         self::assertSame('aggregate-id', $event->aggregateId());
         self::assertInstanceOf(DateTimeImmutable::class, $event->occurredOn());
     }
-}
-
-final class TestDomainEvent extends AbstractDomainEvent
-{
 }

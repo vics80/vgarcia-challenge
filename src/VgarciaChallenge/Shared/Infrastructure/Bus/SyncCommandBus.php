@@ -21,15 +21,25 @@ final class SyncCommandBus implements CommandBus
     public function __construct(iterable $handlers)
     {
         foreach ($handlers as $handler) {
-            if (!is_callable($handler)) {
-                throw InvalidCommandHandlerException::forHandler($handler);
-            }
-
-            $this->handlers[$handler->handles()] = $handler;
+            $this->registerHandler($handler);
         }
     }
 
     public function dispatch(Command $command): mixed
+    {
+        return ($this->handlerFor($command))($command);
+    }
+
+    private function registerHandler(CommandHandler $handler): void
+    {
+        if (!is_callable($handler)) {
+            throw InvalidCommandHandlerException::forHandler($handler);
+        }
+
+        $this->handlers[$handler->handles()] = $handler;
+    }
+
+    private function handlerFor(Command $command): callable
     {
         $handler = $this->handlers[$command::class] ?? null;
 
@@ -37,6 +47,6 @@ final class SyncCommandBus implements CommandBus
             throw CommandHandlerNotFoundException::forCommand($command);
         }
 
-        return $handler($command);
+        return $handler;
     }
 }

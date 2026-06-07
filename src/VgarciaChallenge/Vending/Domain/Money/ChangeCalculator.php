@@ -24,9 +24,7 @@ final class ChangeCalculator
             return Money::empty();
         }
 
-        if ($amountCents < 0) {
-            throw ChangeNotAvailableException::forAmount($amountCents);
-        }
+        $this->ensureAmountCanBeChanged($amountCents);
 
         /** @var array<int, array<int, int>> $bestCombinations */
         $bestCombinations = [0 => []];
@@ -57,11 +55,28 @@ final class ChangeCalculator
             }
         }
 
+        return Money::fromCoinQuantities($this->coinQuantitiesForAmount($amountCents, $bestCombinations));
+    }
+
+    private function ensureAmountCanBeChanged(int $amountCents): void
+    {
+        if ($amountCents < 0) {
+            throw ChangeNotAvailableException::forAmount($amountCents);
+        }
+    }
+
+    /**
+     * @param array<int, array<int, int>> $bestCombinations
+     *
+     * @return array<int, int>
+     */
+    private function coinQuantitiesForAmount(int $amountCents, array $bestCombinations): array
+    {
         if (!array_key_exists($amountCents, $bestCombinations)) {
             throw ChangeNotAvailableException::forAmount($amountCents);
         }
 
-        return Money::fromCoinQuantities($bestCombinations[$amountCents]);
+        return $bestCombinations[$amountCents];
     }
 
     /** @param array<int, int> $coinQuantities */

@@ -7,6 +7,7 @@ namespace App\VgarciaChallenge\Vending\Application\Command;
 use App\VgarciaChallenge\Shared\Application\Command\CommandHandler;
 use App\VgarciaChallenge\Vending\Domain\Money\Money;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\Exception\VendingMachineNotFoundException;
+use App\VgarciaChallenge\Vending\Domain\VendingMachine\VendingMachine;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\VendingMachineRepository;
 
 final readonly class ReturnCoinsCommandHandler implements CommandHandler
@@ -18,11 +19,7 @@ final readonly class ReturnCoinsCommandHandler implements CommandHandler
 
     public function __invoke(ReturnCoinsCommand $command): Money
     {
-        $vendingMachine = $this->vendingMachineRepository->findFirst();
-
-        if (null === $vendingMachine) {
-            throw VendingMachineNotFoundException::becauseNoMachineWasConfigured();
-        }
+        $vendingMachine = $this->configuredVendingMachine();
 
         $returnedMoney = $vendingMachine->returnInsertedMoney();
 
@@ -34,5 +31,16 @@ final readonly class ReturnCoinsCommandHandler implements CommandHandler
     public function handles(): string
     {
         return ReturnCoinsCommand::class;
+    }
+
+    private function configuredVendingMachine(): VendingMachine
+    {
+        $vendingMachine = $this->vendingMachineRepository->findFirst();
+
+        if (null === $vendingMachine) {
+            throw VendingMachineNotFoundException::becauseNoMachineWasConfigured();
+        }
+
+        return $vendingMachine;
     }
 }

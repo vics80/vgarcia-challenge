@@ -68,10 +68,15 @@ final class ProductInventory
 
     private function add(Product $product): void
     {
-        if ($this->has($product->selector())) {
-            throw new DuplicateProductSelectorException();
-        }
+        $this->ensureSelectorIsAvailable($product->selector());
 
         $this->productsBySelector[$product->selector()->value] = $product;
+    }
+
+    private function ensureSelectorIsAvailable(ProductSelector $selector): void
+    {
+        if ($this->has($selector)) {
+            throw new DuplicateProductSelectorException();
+        }
     }
 }

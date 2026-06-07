@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\VgarciaChallenge\Vending\Domain\Product\Exception;
 
+use App\VgarciaChallenge\Shared\Domain\Exception\DomainException;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductSelector;
-use DomainException;
 
 use function sprintf;
 

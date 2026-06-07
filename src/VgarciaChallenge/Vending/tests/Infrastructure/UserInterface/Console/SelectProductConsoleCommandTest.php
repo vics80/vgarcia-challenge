@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\VgarciaChallenge\Vending\Infrastructure\UserInterface\Console;
 
-use App\VgarciaChallenge\Shared\Application\Command\Command;
-use App\VgarciaChallenge\Shared\Application\Command\CommandBus;
+use App\Tests\VgarciaChallenge\Vending\Support\Infrastructure\UserInterface\Console\SelectProductTestCommandBus;
 use App\VgarciaChallenge\Vending\Application\Command\SelectProductCommand;
 use App\VgarciaChallenge\Vending\Application\Command\SelectProductResult;
 use App\VgarciaChallenge\Vending\Domain\Money\Coin;
@@ -64,22 +63,5 @@ final class SelectProductConsoleCommandTest extends TestCase
             $selector->defaultPrice(),
             new ProductStockQuantity(10),
         );
-    }
-}
-
-final class SelectProductTestCommandBus implements CommandBus
-{
-    public ?Command $dispatchedCommand = null;
-
-    public function __construct(
-        private readonly SelectProductResult $result,
-    ) {
-    }
-
-    public function dispatch(Command $command): mixed
-    {
-        $this->dispatchedCommand = $command;
-
-        return $this->result;
     }
 }

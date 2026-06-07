@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\VgarciaChallenge\Shared\Domain;
 
+use App\Tests\VgarciaChallenge\Shared\Support\Domain\OtherTestAggregateRoot;
+use App\Tests\VgarciaChallenge\Shared\Support\Domain\RecordingUpdateRepository;
+use App\Tests\VgarciaChallenge\Shared\Support\Domain\TestAggregateDomainEvent;
+use App\Tests\VgarciaChallenge\Shared\Support\Domain\TestAggregateRoot;
 use App\Tests\VgarciaChallenge\Shared\Support\ValueObject\TestLimitedStringValueObject;
 use App\Tests\VgarciaChallenge\Shared\Support\ValueObject\TestUuidValueObject;
-use App\VgarciaChallenge\Shared\Domain\AggregateRoot;
-use App\VgarciaChallenge\Shared\Domain\Event\AbstractDomainEvent;
-use App\VgarciaChallenge\Shared\Domain\Event\DomainEvent;
 use App\VgarciaChallenge\Shared\Domain\Exception\MissingRequiredKeyException;
-use App\VgarciaChallenge\Shared\Domain\UpdateRepository;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
@@ -123,75 +123,4 @@ final class AggregateRootTest extends TestCase
         yield 'name' => new TestLimitedStringValueObject('new');
         yield 'alias' => new TestLimitedStringValueObject('mark');
     }
-}
-
-final class TestAggregateRoot extends AggregateRoot
-{
-    protected const array UPDATABLE_KEYS = ['name', 'alias'];
-    protected const array REQUIRED_KEYS = ['id', 'name'];
-
-    protected ?TestLimitedStringValueObject $alias = null;
-
-    public function __construct(
-        protected TestUuidValueObject $id,
-        protected TestLimitedStringValueObject $name,
-    ) {
-    }
-
-    /** @param array<string, mixed> $data */
-    public static function fromPayload(array $data): self
-    {
-        self::assertAllKeysExists($data);
-
-        return new self($data['id'], $data['name']);
-    }
-
-    public function id(): TestUuidValueObject
-    {
-        return $this->id;
-    }
-
-    public function name(): TestLimitedStringValueObject
-    {
-        return $this->name;
-    }
-
-    public function alias(): ?TestLimitedStringValueObject
-    {
-        return $this->alias;
-    }
-
-    public function record(DomainEvent $domainEvent): void
-    {
-        $this->recordDomainEvent($domainEvent);
-    }
-}
-
-final class OtherTestAggregateRoot extends AggregateRoot
-{
-    public function __construct(
-        protected TestUuidValueObject $id,
-    ) {
-    }
-
-    public function id(): TestUuidValueObject
-    {
-        return $this->id;
-    }
-}
-
-final class RecordingUpdateRepository implements UpdateRepository
-{
-    public ?AggregateRoot $aggregateRoot = null;
-    public int $updates = 0;
-
-    public function update(AggregateRoot $aggregateRoot): void
-    {
-        $this->aggregateRoot = $aggregateRoot;
-        ++$this->updates;
-    }
-}
-
-final class TestAggregateDomainEvent extends AbstractDomainEvent
-{
 }

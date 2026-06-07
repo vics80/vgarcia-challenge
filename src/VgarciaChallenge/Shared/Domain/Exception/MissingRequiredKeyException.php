@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\VgarciaChallenge\Shared\Domain\Exception;
 
-use DomainException;
-
 use function sprintf;
 
 final class MissingRequiredKeyException extends DomainException

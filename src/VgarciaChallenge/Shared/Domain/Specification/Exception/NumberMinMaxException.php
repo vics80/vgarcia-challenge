@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\VgarciaChallenge\Shared\Domain\Specification\Exception;
 
-use App\VgarciaChallenge\Shared\Domain\ValueObject\ValueObject;
+use App\VgarciaChallenge\Shared\Domain\Exception\DomainException;
 
-final class NumberMinMaxException extends \Exception
+final class NumberMinMaxException extends DomainException
 {
 }

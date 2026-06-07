@@ -21,15 +21,25 @@ final class SyncQueryBus implements QueryBus
     public function __construct(iterable $handlers)
     {
         foreach ($handlers as $handler) {
-            if (!is_callable($handler)) {
-                throw InvalidQueryHandlerException::forHandler($handler);
-            }
-
-            $this->handlers[$handler->handles()] = $handler;
+            $this->registerHandler($handler);
         }
     }
 
     public function ask(Query $query): mixed
+    {
+        return ($this->handlerFor($query))($query);
+    }
+
+    private function registerHandler(QueryHandler $handler): void
+    {
+        if (!is_callable($handler)) {
+            throw InvalidQueryHandlerException::forHandler($handler);
+        }
+
+        $this->handlers[$handler->handles()] = $handler;
+    }
+
+    private function handlerFor(Query $query): callable
     {
         $handler = $this->handlers[$query::class] ?? null;
 
@@ -37,6 +47,6 @@ final class SyncQueryBus implements QueryBus
             throw QueryHandlerNotFoundException::forQuery($query);
         }
 
-        return $handler($query);
+        return $handler;
     }
 }

@@ -8,6 +8,7 @@ use App\VgarciaChallenge\Shared\Application\Command\CommandHandler;
 use App\VgarciaChallenge\Vending\Domain\Product\Exception\ProductNotFoundException;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductSelector;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\Exception\VendingMachineNotFoundException;
+use App\VgarciaChallenge\Vending\Domain\VendingMachine\VendingMachine;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\VendingMachineRepository;
 
 final readonly class DecrementProductStockCommandHandler implements CommandHandler
@@ -19,17 +20,8 @@ final readonly class DecrementProductStockCommandHandler implements CommandHandl
 
     public function __invoke(DecrementProductStockCommand $command): void
     {
-        $vendingMachine = $this->vendingMachineRepository->findFirst();
-
-        if (null === $vendingMachine) {
-            throw VendingMachineNotFoundException::becauseNoMachineWasConfigured();
-        }
-
-        $selector = ProductSelector::tryFrom($command->selector());
-
-        if (null === $selector) {
-            throw ProductNotFoundException::forSelector($command->selector());
-        }
+        $vendingMachine = $this->configuredVendingMachine();
+        $selector = $this->productSelectorFrom($command);
 
         $vendingMachine->decrementProductStock($selector);
 
@@ -39,5 +31,27 @@ final readonly class DecrementProductStockCommandHandler implements CommandHandl
     public function handles(): string
     {
         return DecrementProductStockCommand::class;
+    }
+
+    private function configuredVendingMachine(): VendingMachine
+    {
+        $vendingMachine = $this->vendingMachineRepository->findFirst();
+
+        if (null === $vendingMachine) {
+            throw VendingMachineNotFoundException::becauseNoMachineWasConfigured();
+        }
+
+        return $vendingMachine;
+    }
+
+    private function productSelectorFrom(DecrementProductStockCommand $command): ProductSelector
+    {
+        $selector = ProductSelector::tryFrom($command->selector());
+
+        if (null === $selector) {
+            throw ProductNotFoundException::forSelector($command->selector());
+        }
+
+        return $selector;
     }
 }

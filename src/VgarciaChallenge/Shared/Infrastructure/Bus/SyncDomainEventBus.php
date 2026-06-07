@@ -19,11 +19,7 @@ final class SyncDomainEventBus implements DomainEventBus
     public function __construct(iterable $subscribers)
     {
         foreach ($subscribers as $subscriber) {
-            if (!is_callable($subscriber)) {
-                continue;
-            }
-
-            $this->subscribers[$subscriber->subscribedTo()][] = $subscriber;
+            $this->registerSubscriber($subscriber);
         }
     }
 
@@ -34,5 +30,14 @@ final class SyncDomainEventBus implements DomainEventBus
                 $subscriber($domainEvent);
             }
         }
+    }
+
+    private function registerSubscriber(DomainEventSubscriber $subscriber): void
+    {
+        if (!is_callable($subscriber)) {
+            return;
+        }
+
+        $this->subscribers[$subscriber->subscribedTo()][] = $subscriber;
     }
 }

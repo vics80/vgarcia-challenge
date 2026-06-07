@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\VgarciaChallenge\Vending\Application\Command;
 
-use App\VgarciaChallenge\Shared\Application\Query\Query;
-use App\VgarciaChallenge\Shared\Application\Query\QueryBus;
+use App\Tests\VgarciaChallenge\Vending\Support\Application\Query\SelectProductTestQueryBus;
 use App\VgarciaChallenge\Shared\Domain\Event\DomainEvent;
 use App\VgarciaChallenge\Shared\Domain\Event\DomainEventBus;
 use App\VgarciaChallenge\Vending\Application\Command\SelectProductCommand;
@@ -110,22 +109,5 @@ final class SelectProductCommandHandlerTest extends TestCase
             $selector->defaultPrice(),
             new ProductStockQuantity(10),
         );
-    }
-}
-
-final class SelectProductTestQueryBus implements QueryBus
-{
-    public ?Query $query = null;
-
-    public function __construct(
-        private readonly Product $product,
-    ) {
-    }
-
-    public function ask(Query $query): mixed
-    {
-        $this->query = $query;
-
-        return $this->product;
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\VgarciaChallenge\Vending\Domain\VendingMachine\Exception;
 
-use DomainException;
+use App\VgarciaChallenge\Shared\Domain\Exception\DomainException;
 
 final class CoinsNotFoundException extends DomainException
 {

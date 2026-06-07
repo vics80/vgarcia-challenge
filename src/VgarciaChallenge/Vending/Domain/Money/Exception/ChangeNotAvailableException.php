@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\VgarciaChallenge\Vending\Domain\Money\Exception;
 
-use DomainException;
+use App\VgarciaChallenge\Shared\Domain\Exception\DomainException;
 
 use function sprintf;
 

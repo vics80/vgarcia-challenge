@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\VgarciaChallenge\Shared\Domain;
 
-use App\VgarciaChallenge\Shared\Domain\Timestampable;
+use App\Tests\VgarciaChallenge\Shared\Support\Domain\TestTimestampableEntity;
 use DateTimeImmutable;
 use DateTimeInterface;
 use PHPUnit\Framework\TestCase;
@@ -60,22 +60,5 @@ final class TimestampableTest extends TestCase
         $entity->touchNow();
 
         self::assertInstanceOf(DateTimeInterface::class, $entity->updatedAt());
-    }
-}
-
-final class TestTimestampableEntity
-{
-    use Timestampable;
-
-    public function initialize(
-        ?DateTimeInterface $createdAt = null,
-        ?DateTimeInterface $updatedAt = null,
-    ): void {
-        $this->initializeTimestamps($createdAt, $updatedAt);
-    }
-
-    public function touchNow(?DateTimeInterface $updatedAt = null): void
-    {
-        $this->touch($updatedAt);
     }
 }

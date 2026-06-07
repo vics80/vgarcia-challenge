@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\VgarciaChallenge\Shared\Infrastructure\Bus;
 
-use App\VgarciaChallenge\Shared\Application\Command\Command;
-use App\VgarciaChallenge\Shared\Application\Command\CommandHandler;
+use App\Tests\VgarciaChallenge\Shared\Support\Infrastructure\Bus\InvalidTestCommandHandler;
+use App\Tests\VgarciaChallenge\Shared\Support\Infrastructure\Bus\TestCommand;
+use App\Tests\VgarciaChallenge\Shared\Support\Infrastructure\Bus\TestCommandHandler;
 use App\VgarciaChallenge\Shared\Application\Command\Exception\CommandHandlerNotFoundException;
 use App\VgarciaChallenge\Shared\Application\Command\Exception\InvalidCommandHandlerException;
 use App\VgarciaChallenge\Shared\Infrastructure\Bus\SyncCommandBus;
@@ -38,34 +39,5 @@ final class SyncCommandBusTest extends TestCase
         $this->expectException(InvalidCommandHandlerException::class);
 
         new SyncCommandBus([new InvalidTestCommandHandler()]);
-    }
-}
-
-final class TestCommand implements Command
-{
-}
-
-final class TestCommandHandler implements CommandHandler
-{
-    public bool $wasCalled = false;
-
-    public function __invoke(TestCommand $command): string
-    {
-        $this->wasCalled = true;
-
-        return 'handled';
-    }
-
-    public function handles(): string
-    {
-        return TestCommand::class;
-    }
-}
-
-final class InvalidTestCommandHandler implements CommandHandler
-{
-    public function handles(): string
-    {
-        return TestCommand::class;
     }
 }

@@ -135,13 +135,8 @@ final class Money
         $validCoins = $this->validCoinValues();
 
         foreach ($coinQuantities as $coinCents => $quantity) {
-            if (!array_key_exists($coinCents, $validCoins)) {
-                throw InvalidCoinException::fromCents($coinCents);
-            }
-
-            if ($quantity < 0) {
-                throw InvalidCoinQuantityException::fromQuantity($quantity);
-            }
+            $this->ensureCoinIsAccepted($coinCents, $validCoins);
+            $this->ensureQuantityIsNotNegative($quantity);
 
             if (0 === $quantity) {
                 continue;
@@ -153,6 +148,21 @@ final class Money
         ksort($normalized);
 
         return $normalized;
+    }
+
+    /** @param array<int, true> $validCoins */
+    private function ensureCoinIsAccepted(int $coinCents, array $validCoins): void
+    {
+        if (!array_key_exists($coinCents, $validCoins)) {
+            throw InvalidCoinException::fromCents($coinCents);
+        }
+    }
+
+    private function ensureQuantityIsNotNegative(int $quantity): void
+    {
+        if ($quantity < 0) {
+            throw InvalidCoinQuantityException::fromQuantity($quantity);
+        }
     }
 
     /** @return array<int, true> */

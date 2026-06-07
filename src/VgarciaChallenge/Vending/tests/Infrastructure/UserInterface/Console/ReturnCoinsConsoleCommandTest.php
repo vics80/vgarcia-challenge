@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\VgarciaChallenge\Vending\Infrastructure\UserInterface\Console;
 
-use App\VgarciaChallenge\Shared\Application\Command\Command;
-use App\VgarciaChallenge\Shared\Application\Command\CommandBus;
+use App\Tests\VgarciaChallenge\Vending\Support\Infrastructure\UserInterface\Console\ReturnCoinsTestCommandBus;
 use App\VgarciaChallenge\Vending\Application\Command\ReturnCoinsCommand;
 use App\VgarciaChallenge\Vending\Domain\Money\Coin;
 use App\VgarciaChallenge\Vending\Domain\Money\Money;
@@ -30,22 +29,5 @@ final class ReturnCoinsConsoleCommandTest extends TestCase
         self::assertSame(SymfonyCommand::SUCCESS, $exitCode);
         self::assertInstanceOf(ReturnCoinsCommand::class, $commandBus->dispatchedCommand);
         self::assertStringContainsString('Returned coins: 0.05, 0.05, 0.25.', $commandTester->getDisplay());
-    }
-}
-
-final class ReturnCoinsTestCommandBus implements CommandBus
-{
-    public ?Command $dispatchedCommand = null;
-
-    public function __construct(
-        private readonly Money $returnedMoney,
-    ) {
-    }
-
-    public function dispatch(Command $command): mixed
-    {
-        $this->dispatchedCommand = $command;
-
-        return $this->returnedMoney;
     }
 }

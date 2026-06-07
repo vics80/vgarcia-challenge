@@ -12,6 +12,7 @@ use App\VgarciaChallenge\Vending\Domain\Product\Exception\ProductOutOfStockExcep
 use App\VgarciaChallenge\Vending\Domain\Product\Product;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductSelector;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\Exception\VendingMachineNotFoundException;
+use App\VgarciaChallenge\Vending\Domain\VendingMachine\VendingMachine;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\VendingMachineRepository;
 
 final readonly class FindPurchasableProductQueryHandler implements QueryHandler
@@ -24,36 +25,13 @@ final readonly class FindPurchasableProductQueryHandler implements QueryHandler
 
     public function __invoke(FindPurchasableProductQuery $query): Product
     {
-        $vendingMachine = $this->vendingMachineRepository->findFirst();
+        $vendingMachine = $this->configuredVendingMachine();
+        $selector = $this->productSelectorFrom($query);
+        $product = $this->productForSelector($vendingMachine, $selector);
 
-        if (null === $vendingMachine) {
-            throw VendingMachineNotFoundException::becauseNoMachineWasConfigured();
-        }
-
-        $selector = ProductSelector::tryFrom($query->selector());
-
-        if (null === $selector) {
-            throw ProductNotFoundException::forSelector($query->selector());
-        }
-
-        $product = $vendingMachine->productInventory()->find($selector);
-
-        if (null === $product) {
-            throw ProductNotFoundException::forSelector($selector->value);
-        }
-
-        if (0 === $product->stockQuantity()->value()) {
-            throw ProductOutOfStockException::forSelector($selector);
-        }
-
-        $insertedCents = $vendingMachine->insertedMoney()->totalCents();
-        $priceCents = $product->price()->cents();
-
-        if ($insertedCents < $priceCents) {
-            throw InsufficientMoneyException::forSelector($selector, $priceCents, $insertedCents);
-        }
-
-        $this->changeCalculator->calculate($vendingMachine->availableChange(), $insertedCents - $priceCents);
+        $this->ensureProductHasStock($product, $selector);
+        $this->ensureInsertedMoneyIsEnough($vendingMachine, $product, $selector);
+        $this->ensureChangeCanBeReturned($vendingMachine, $product);
 
         return $product;
     }
@@ -61,5 +39,66 @@ final readonly class FindPurchasableProductQueryHandler implements QueryHandler
     public function handles(): string
     {
         return FindPurchasableProductQuery::class;
+    }
+
+    private function configuredVendingMachine(): VendingMachine
+    {
+        $vendingMachine = $this->vendingMachineRepository->findFirst();
+
+        if (null === $vendingMachine) {
+            throw VendingMachineNotFoundException::becauseNoMachineWasConfigured();
+        }
+
+        return $vendingMachine;
+    }
+
+    private function productSelectorFrom(FindPurchasableProductQuery $query): ProductSelector
+    {
+        $selector = ProductSelector::tryFrom($query->selector());
+
+        if (null === $selector) {
+            throw ProductNotFoundException::forSelector($query->selector());
+        }
+
+        return $selector;
+    }
+
+    private function productForSelector(VendingMachine $vendingMachine, ProductSelector $selector): Product
+    {
+        $product = $vendingMachine->productInventory()->find($selector);
+
+        if (null === $product) {
+            throw ProductNotFoundException::forSelector($selector->value);
+        }
+
+        return $product;
+    }
+
+    private function ensureProductHasStock(Product $product, ProductSelector $selector): void
+    {
+        if (0 === $product->stockQuantity()->value()) {
+            throw ProductOutOfStockException::forSelector($selector);
+        }
+    }
+
+    private function ensureInsertedMoneyIsEnough(
+        VendingMachine $vendingMachine,
+        Product $product,
+        ProductSelector $selector,
+    ): void {
+        $insertedCents = $vendingMachine->insertedMoney()->totalCents();
+        $priceCents = $product->price()->cents();
+
+        if ($insertedCents < $priceCents) {
+            throw InsufficientMoneyException::forSelector($selector, $priceCents, $insertedCents);
+        }
+    }
+
+    private function ensureChangeCanBeReturned(VendingMachine $vendingMachine, Product $product): void
+    {
+        $this->changeCalculator->calculate(
+            $vendingMachine->availableChange(),
+            $vendingMachine->insertedMoney()->totalCents() - $product->price()->cents(),
+        );
     }
 }

@@ -100,9 +100,7 @@ class VendingMachine extends AggregateRoot
 
     public function returnInsertedMoney(): Money
     {
-        if (0 === $this->insertedMoney->totalCents()) {
-            throw CoinsNotFoundException::becauseNoCoinsWereInserted();
-        }
+        $this->ensureCoinsWereInserted();
 
         $returnedMoney = $this->insertedMoney;
         $this->insertedMoney = Money::empty();
@@ -124,11 +122,7 @@ class VendingMachine extends AggregateRoot
 
     public function decrementProductStock(ProductSelector $selector): void
     {
-        $product = $this->productInventory->find($selector);
-
-        if (null === $product) {
-            throw ProductNotFoundException::forSelector($selector->value);
-        }
+        $product = $this->productForSelector($selector);
 
         $product->decrementStock();
         $this->productInventory = ProductInventory::fromPrimitives($this->productInventory->toPrimitives());
@@ -140,5 +134,23 @@ class VendingMachine extends AggregateRoot
         $this->availableChange = $this->availableChange->subtract($returnedChange);
         $this->insertedMoney = Money::empty();
         $this->touch();
+    }
+
+    private function ensureCoinsWereInserted(): void
+    {
+        if (0 === $this->insertedMoney->totalCents()) {
+            throw CoinsNotFoundException::becauseNoCoinsWereInserted();
+        }
+    }
+
+    private function productForSelector(ProductSelector $selector): Product
+    {
+        $product = $this->productInventory->find($selector);
+
+        if (null === $product) {
+            throw ProductNotFoundException::forSelector($selector->value);
+        }
+
+        return $product;
     }
 }

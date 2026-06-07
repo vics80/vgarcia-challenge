@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\VgarciaChallenge\Shared\Infrastructure\Bus;
 
+use App\Tests\VgarciaChallenge\Shared\Support\Infrastructure\Bus\InvalidTestQueryHandler;
+use App\Tests\VgarciaChallenge\Shared\Support\Infrastructure\Bus\TestQuery;
+use App\Tests\VgarciaChallenge\Shared\Support\Infrastructure\Bus\TestQueryHandler;
 use App\VgarciaChallenge\Shared\Application\Query\Exception\InvalidQueryHandlerException;
 use App\VgarciaChallenge\Shared\Application\Query\Exception\QueryHandlerNotFoundException;
-use App\VgarciaChallenge\Shared\Application\Query\Query;
-use App\VgarciaChallenge\Shared\Application\Query\QueryHandler;
 use App\VgarciaChallenge\Shared\Infrastructure\Bus\SyncQueryBus;
 use PHPUnit\Framework\TestCase;
 
@@ -39,38 +40,5 @@ final class SyncQueryBusTest extends TestCase
         $this->expectException(InvalidQueryHandlerException::class);
 
         new SyncQueryBus([new InvalidTestQueryHandler()]);
-    }
-}
-
-final class TestQuery implements Query
-{
-    public function __construct(
-        public readonly string $criteria,
-    ) {
-    }
-}
-
-final class TestQueryHandler implements QueryHandler
-{
-    public ?TestQuery $handledQuery = null;
-
-    public function __invoke(TestQuery $query): string
-    {
-        $this->handledQuery = $query;
-
-        return sprintf('result:%s', $query->criteria);
-    }
-
-    public function handles(): string
-    {
-        return TestQuery::class;
-    }
-}
-
-final class InvalidTestQueryHandler implements QueryHandler
-{
-    public function handles(): string
-    {
-        return TestQuery::class;
     }
 }
