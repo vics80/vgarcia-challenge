@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\VgarciaChallenge\Vending\Infrastructure\UserInterface\Console;
 
 use App\VgarciaChallenge\Shared\Application\Command\CommandBus;
-use App\VgarciaChallenge\Vending\Application\Command\UpdateProductStockCommand;
-use App\VgarciaChallenge\Vending\Application\Command\UpdateProductStockResult;
+use App\VgarciaChallenge\Vending\Application\Command\UpdateCoinInventoryCommand;
+use App\VgarciaChallenge\Vending\Application\Command\UpdateCoinInventoryResult;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,10 +17,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use function sprintf;
 
 #[AsCommand(
-    name: 'vending:admin:stock',
-    description: 'Add or remove product stock from the vending machine.',
+    name: 'vending:admin:coins',
+    description: 'Add or remove coins from the vending machine change inventory.',
 )]
-final class AdminProductStockConsoleCommand extends AbstractSignedQuantityConsoleCommand
+final class AdminCoinInventoryConsoleCommand extends AbstractSignedQuantityConsoleCommand
 {
     public function __construct(
         private readonly CommandBus $commandBus,
@@ -34,9 +34,9 @@ final class AdminProductStockConsoleCommand extends AbstractSignedQuantityConsol
 
         $this
             ->addArgument(
-                'selector',
+                'coin',
                 InputArgument::REQUIRED,
-                'Product selector: WATER, JUICE or SODA',
+                'Coin: 0.05, 0.10, 0.25 or 1.00',
             )
             ->addArgument(
                 'quantity',
@@ -47,18 +47,18 @@ final class AdminProductStockConsoleCommand extends AbstractSignedQuantityConsol
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $selector = (string) $input->getArgument('selector');
-        $quantity = $this->quantityFrom($input, 'selector');
+        $coin = (string) $input->getArgument('coin');
+        $quantity = $this->quantityFrom($input, 'coin');
 
-        /** @var UpdateProductStockResult $result */
-        $result = $this->commandBus->dispatch(new UpdateProductStockCommand($selector, $quantity));
+        /** @var UpdateCoinInventoryResult $result */
+        $result = $this->commandBus->dispatch(new UpdateCoinInventoryCommand($coin, $quantity));
 
         (new SymfonyStyle($input, $output))->success(sprintf(
-            'Updated stock for %s by %+d. Current stock: %d/%d.',
-            $result->selector()->value,
+            'Updated coin inventory for %s by %+d. Current quantity: %d/%d.',
+            $result->coin()->decimalString(),
             $result->quantity(),
-            $result->stockQuantity()->value(),
-            $result->maxStockQuantity()->value(),
+            $result->inventoryQuantity()->value(),
+            $result->maxInventoryQuantity()->value(),
         ));
 
         return Command::SUCCESS;

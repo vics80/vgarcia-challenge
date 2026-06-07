@@ -7,6 +7,7 @@ namespace App\VgarciaChallenge\Vending\Domain\VendingMachine;
 use App\VgarciaChallenge\Shared\Domain\AggregateRoot;
 use App\VgarciaChallenge\Shared\Domain\Timestampable;
 use App\VgarciaChallenge\Vending\Domain\Money\Coin;
+use App\VgarciaChallenge\Vending\Domain\Money\CoinInventory;
 use App\VgarciaChallenge\Vending\Domain\Money\Money;
 use App\VgarciaChallenge\Vending\Domain\Product\Exception\ProductNotFoundException;
 use App\VgarciaChallenge\Vending\Domain\Product\Product;
@@ -26,7 +27,7 @@ class VendingMachine extends AggregateRoot
     private function __construct(
         private VendingMachineId $vendingMachineId,
         private Money $insertedMoney,
-        private Money $availableChange,
+        private CoinInventory $availableChange,
         private ProductInventory $productInventory,
         ?DateTimeInterface $createdAt = null,
         ?DateTimeInterface $updatedAt = null,
@@ -36,13 +37,13 @@ class VendingMachine extends AggregateRoot
 
     public static function create(
         VendingMachineId $vendingMachineId,
-        Money $availableChange,
+        Money|CoinInventory $availableChange,
         ProductInventory $productInventory,
     ): self {
         return new self(
             $vendingMachineId,
             Money::empty(),
-            $availableChange,
+            self::coinInventoryFrom($availableChange),
             $productInventory,
         );
     }
@@ -50,7 +51,7 @@ class VendingMachine extends AggregateRoot
     public static function reconstitute(
         VendingMachineId $vendingMachineId,
         Money $insertedMoney,
-        Money $availableChange,
+        Money|CoinInventory $availableChange,
         ProductInventory $productInventory,
         ?DateTimeInterface $createdAt = null,
         ?DateTimeInterface $updatedAt = null,
@@ -58,7 +59,7 @@ class VendingMachine extends AggregateRoot
         return new self(
             $vendingMachineId,
             $insertedMoney,
-            $availableChange,
+            self::coinInventoryFrom($availableChange),
             $productInventory,
             $createdAt,
             $updatedAt,
@@ -75,7 +76,7 @@ class VendingMachine extends AggregateRoot
         return $this->insertedMoney;
     }
 
-    public function availableChange(): Money
+    public function availableChange(): CoinInventory
     {
         return $this->availableChange;
     }
@@ -137,11 +138,28 @@ class VendingMachine extends AggregateRoot
         return $this->productForSelector($selector);
     }
 
+    public function changeCoinInventory(Coin $coin, int $quantity): CoinInventory
+    {
+        $this->availableChange = $this->availableChange->changeCoinQuantity($coin, $quantity);
+        $this->touch();
+
+        return $this->availableChange;
+    }
+
     public function returnChangeAndClearInsertedMoney(Money $returnedChange): void
     {
         $this->availableChange = $this->availableChange->subtract($returnedChange);
         $this->insertedMoney = Money::empty();
         $this->touch();
+    }
+
+    private static function coinInventoryFrom(Money|CoinInventory $availableChange): CoinInventory
+    {
+        if ($availableChange instanceof CoinInventory) {
+            return $availableChange;
+        }
+
+        return CoinInventory::fromMoney($availableChange);
     }
 
     private function ensureCoinsWereInserted(): void

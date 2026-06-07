@@ -9,7 +9,7 @@
         </id>
 
         <field name="insertedMoney" type="money" column="inserted_money"/>
-        <field name="availableChange" type="money" column="available_change"/>
+        <field name="availableChange" type="coin_inventory" column="available_change"/>
         <field name="productInventory" type="product_inventory" column="product_inventory"/>
         <field name="createdAt" type="datetime_immutable" column="created_at"/>
         <field name="updatedAt" type="datetime_immutable" column="updated_at"/>

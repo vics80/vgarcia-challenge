@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Fixture;
 
+use App\VgarciaChallenge\Vending\Domain\Money\Coin;
 use App\VgarciaChallenge\Vending\Domain\Product\Product;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductSelector;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\VendingMachine;
@@ -48,6 +49,7 @@ final class InitialVendingMachineFixtureTest extends TestCase
         self::assertSame('018f47d2-7c6a-7caa-b9d4-8b22f1c6d000', $vendingMachine->vendingMachineId()->value());
         self::assertSame(0, $vendingMachine->insertedMoney()->totalCents());
         self::assertSame(1400, $vendingMachine->availableChange()->totalCents());
+        self::assertSame(100, $vendingMachine->availableChange()->maxQuantityOf(Coin::ONE_EURO)->value());
         self::assertCount(3, $vendingMachine->productInventory()->products());
     }
 }

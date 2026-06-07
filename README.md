@@ -84,6 +84,13 @@ make admin-stock SELECTOR=WATER QUANTITY=5
 make admin-stock SELECTOR=SODA QUANTITY=-3
 ```
 
+Add or remove coins from the available change inventory as a machine admin with:
+
+```bash
+make admin-coins COIN=0.25 QUANTITY=5
+make admin-coins COIN=1.00 QUANTITY=-3
+```
+
 Run the full PHPUnit suite with:
 
 ```bash
@@ -130,6 +137,7 @@ make test-one TEST=src/VgarciaChallenge/Vending/tests/Domain/Money/MoneyTest.php
 - `make return-coins`: return the inserted coins from the vending machine.
 - `make select-product SELECTOR=WATER`: select a product from the vending machine.
 - `make admin-stock SELECTOR=WATER QUANTITY=5`: add or remove product stock.
+- `make admin-coins COIN=0.25 QUANTITY=5`: add or remove coins from available change.
 - `make test`: run tests.
 - `make test-coverage`: run tests and generate the HTML coverage report.
 - `make quality-tools`: run PHPStan, PHPMD, ECS and Rector in dry/report mode.
@@ -144,6 +152,7 @@ make test-one TEST=src/VgarciaChallenge/Vending/tests/Domain/Money/MoneyTest.php
 - Shared domain primitives live under `src/VgarciaChallenge/Shared/Domain`.
 - Domain entities and value objects do not use Doctrine attributes; persistence metadata is defined with XML mapping under infrastructure.
 - Money is represented in cents and stored as a collection of accepted coins.
+- Available change is modeled as a coin inventory with configurable maximum quantities per coin.
 - `VendingMachine` is the main aggregate root and contains inserted money, available change and product inventory.
 - Domain events are prepared in Shared through a minimal interface and aggregate event recording/pulling.
 - Tests focus on domain invariants and application behavior, not on testing Doctrine itself.

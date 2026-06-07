@@ -35,4 +35,9 @@ enum Coin: int
     {
         return sprintf('%d.%02d', intdiv($this->value, 100), $this->value % 100);
     }
+
+    public function defaultMaxInventoryQuantity(): CoinMaxInventoryQuantity
+    {
+        return new CoinMaxInventoryQuantity(100);
+    }
 }

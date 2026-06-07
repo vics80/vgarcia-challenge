@@ -95,6 +95,36 @@ final class AdminProductStockConsoleCommandTest extends TestCase
         self::assertSame(-3, $commandBus->dispatchedCommand->quantity());
     }
 
+    public function testAcceptsNegativeQuantityFromAbbreviatedCommandArgvInput(): void
+    {
+        $argv = $_SERVER['argv'] ?? [];
+        $commandBus = new UpdateProductStockTestCommandBus(new UpdateProductStockResult(
+            ProductSelector::WATER,
+            -5,
+            new ProductStockQuantity(5),
+            new ProductMaxStockQuantity(20),
+        ));
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->add(new AdminProductStockConsoleCommand($commandBus));
+
+        try {
+            $_SERVER['argv'] = ['bin/console', 'ven:adm:sto', 'WATER', '-5'];
+
+            $exitCode = $application->run(
+                new ArgvInput($_SERVER['argv']),
+                new BufferedOutput(),
+            );
+        } finally {
+            $_SERVER['argv'] = $argv;
+        }
+
+        self::assertSame(SymfonyCommand::SUCCESS, $exitCode);
+        self::assertInstanceOf(UpdateProductStockCommand::class, $commandBus->dispatchedCommand);
+        self::assertSame('WATER', $commandBus->dispatchedCommand->selector());
+        self::assertSame(-5, $commandBus->dispatchedCommand->quantity());
+    }
+
     public function testFailsWhenQuantityIsMissing(): void
     {
         $commandBus = new UpdateProductStockTestCommandBus(new UpdateProductStockResult(

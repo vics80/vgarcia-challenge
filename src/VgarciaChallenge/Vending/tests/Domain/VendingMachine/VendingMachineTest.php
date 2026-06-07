@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\VgarciaChallenge\Vending\Domain\VendingMachine;
 
 use App\VgarciaChallenge\Vending\Domain\Money\Coin;
+use App\VgarciaChallenge\Vending\Domain\Money\CoinInventory;
+use App\VgarciaChallenge\Vending\Domain\Money\Exception\CoinInventoryLimitExceededException;
+use App\VgarciaChallenge\Vending\Domain\Money\Exception\CoinInventoryNotEnoughException;
 use App\VgarciaChallenge\Vending\Domain\Money\Money;
 use App\VgarciaChallenge\Vending\Domain\Product\Exception\ProductNotFoundException;
 use App\VgarciaChallenge\Vending\Domain\Product\Exception\ProductStockLimitExceededException;
@@ -34,7 +37,7 @@ final class VendingMachineTest extends TestCase
 
         self::assertSame($id, $vendingMachine->vendingMachineId());
         self::assertSame(0, $vendingMachine->insertedMoney()->totalCents());
-        self::assertSame($availableChange, $vendingMachine->availableChange());
+        self::assertSame($availableChange->totalCents(), $vendingMachine->availableChange()->totalCents());
         self::assertSame($productInventory, $vendingMachine->productInventory());
         self::assertSame($vendingMachine->createdAt(), $vendingMachine->updatedAt());
     }
@@ -233,6 +236,49 @@ final class VendingMachineTest extends TestCase
         self::assertSame(15, $updatedProduct->stockQuantity()->value());
         self::assertNotSame($initialInventory, $vendingMachine->productInventory());
         self::assertSame(15, $vendingMachine->productInventory()->find(ProductSelector::WATER)?->stockQuantity()->value());
+    }
+
+    public function testChangesCoinInventory(): void
+    {
+        $vendingMachine = VendingMachine::create(
+            VendingMachineId::random(),
+            CoinInventory::fromCoinQuantities([Coin::FIVE_CENTS->cents() => 2]),
+            ProductInventory::empty(),
+        );
+
+        $updatedInventory = $vendingMachine->changeCoinInventory(Coin::FIVE_CENTS, 3);
+
+        self::assertSame(5, $updatedInventory->quantityOf(Coin::FIVE_CENTS));
+        self::assertSame(5, $vendingMachine->availableChange()->quantityOf(Coin::FIVE_CENTS));
+    }
+
+    public function testFailsWhenRemovingMoreCoinInventoryThanAvailable(): void
+    {
+        $vendingMachine = VendingMachine::create(
+            VendingMachineId::random(),
+            CoinInventory::fromCoinQuantities([Coin::FIVE_CENTS->cents() => 2]),
+            ProductInventory::empty(),
+        );
+
+        $this->expectException(CoinInventoryNotEnoughException::class);
+
+        $vendingMachine->changeCoinInventory(Coin::FIVE_CENTS, -3);
+    }
+
+    public function testFailsWhenAddingCoinInventoryExceedsMaxQuantity(): void
+    {
+        $vendingMachine = VendingMachine::create(
+            VendingMachineId::random(),
+            CoinInventory::fromCoinQuantitiesWithMax(
+                [Coin::FIVE_CENTS->cents() => 2],
+                [Coin::FIVE_CENTS->cents() => 3],
+            ),
+            ProductInventory::empty(),
+        );
+
+        $this->expectException(CoinInventoryLimitExceededException::class);
+
+        $vendingMachine->changeCoinInventory(Coin::FIVE_CENTS, 2);
     }
 
     public function testFailsWhenRemovingMoreProductStockThanAvailable(): void

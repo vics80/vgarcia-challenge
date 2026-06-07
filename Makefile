@@ -1,4 +1,4 @@
-.PHONY: help install up down restart logs shell composer-install composer-dump-autoload setup fixtures-load insert-coin return-coins select-product admin-stock test test-one test-coverage quality-tools quality-tools-dry quality-tools-fix migrate migration-diff schema-validate console
+.PHONY: help install up down restart logs shell composer-install composer-dump-autoload setup fixtures-load insert-coin return-coins select-product admin-stock admin-coins test test-one test-coverage quality-tools quality-tools-dry quality-tools-fix migrate migration-diff schema-validate console
 
 DOCKER_COMPOSE := docker compose -f docker-compose.yaml
 APP_CONTAINER := vgarcia-challenge
@@ -59,6 +59,11 @@ admin-stock: ## Add/remove product stock, for example make admin-stock SELECTOR=
 	@test -n "$(SELECTOR)" || (echo "Set SELECTOR=WATER, JUICE or SODA" && exit 1)
 	@test -n "$(QUANTITY)" || (echo "Set QUANTITY=5 or QUANTITY=-3" && exit 1)
 	@$(CONSOLE) vending:admin:stock $(SELECTOR) $(QUANTITY)
+
+admin-coins: ## Add/remove coins from available change, for example make admin-coins COIN=0.25 QUANTITY=5
+	@test -n "$(COIN)" || (echo "Set COIN=0.05, 0.10, 0.25 or 1.00" && exit 1)
+	@test -n "$(QUANTITY)" || (echo "Set QUANTITY=5 or QUANTITY=-3" && exit 1)
+	@$(CONSOLE) vending:admin:coins $(COIN) $(QUANTITY)
 
 test: ## Run the PHPUnit test suite
 	$(DOCKER_EXEC) php vendor/bin/phpunit --colors=always

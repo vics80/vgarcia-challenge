@@ -18,7 +18,7 @@ final class ChangeCalculator
         Coin::FIVE_CENTS,
     ];
 
-    public function calculate(Money $availableChange, int $amountCents): Money
+    public function calculate(CoinInventory $availableChange, int $amountCents): Money
     {
         if (0 === $amountCents) {
             return Money::empty();

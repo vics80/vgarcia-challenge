@@ -15,6 +15,7 @@ doctrine:
             product_max_stock_quantity: App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\ProductMaxStockQuantityType
             order_total_amount: App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\OrderTotalAmountType
             money: App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\MoneyType
+            coin_inventory: App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\CoinInventoryType
             product_inventory: App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\ProductInventoryType
     orm:
         auto_generate_proxy_classes: true

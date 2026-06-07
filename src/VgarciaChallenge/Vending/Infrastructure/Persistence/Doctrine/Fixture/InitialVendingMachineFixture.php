@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Fixture;
 
 use App\VgarciaChallenge\Vending\Domain\Money\Coin;
+use App\VgarciaChallenge\Vending\Domain\Money\CoinInventory;
 use App\VgarciaChallenge\Vending\Domain\Money\Money;
 use App\VgarciaChallenge\Vending\Domain\Product\Product;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductId;
@@ -23,6 +24,8 @@ final class InitialVendingMachineFixture extends Fixture
     private const int INITIAL_PRODUCT_STOCK = 10;
 
     private const int INITIAL_CHANGE_COINS_PER_DENOMINATION = 10;
+
+    private const int MAX_CHANGE_COINS_PER_DENOMINATION = 100;
 
     public function load(ObjectManager $manager): void
     {
@@ -56,13 +59,21 @@ final class InitialVendingMachineFixture extends Fixture
         );
     }
 
-    private function initialAvailableChange(): Money
+    private function initialAvailableChange(): CoinInventory
     {
-        return Money::fromCoinQuantities([
-            Coin::FIVE_CENTS->cents() => self::INITIAL_CHANGE_COINS_PER_DENOMINATION,
-            Coin::TEN_CENTS->cents() => self::INITIAL_CHANGE_COINS_PER_DENOMINATION,
-            Coin::TWENTY_FIVE_CENTS->cents() => self::INITIAL_CHANGE_COINS_PER_DENOMINATION,
-            Coin::ONE_EURO->cents() => self::INITIAL_CHANGE_COINS_PER_DENOMINATION,
-        ]);
+        return CoinInventory::fromCoinQuantitiesWithMax(
+            [
+                Coin::FIVE_CENTS->cents() => self::INITIAL_CHANGE_COINS_PER_DENOMINATION,
+                Coin::TEN_CENTS->cents() => self::INITIAL_CHANGE_COINS_PER_DENOMINATION,
+                Coin::TWENTY_FIVE_CENTS->cents() => self::INITIAL_CHANGE_COINS_PER_DENOMINATION,
+                Coin::ONE_EURO->cents() => self::INITIAL_CHANGE_COINS_PER_DENOMINATION,
+            ],
+            [
+                Coin::FIVE_CENTS->cents() => self::MAX_CHANGE_COINS_PER_DENOMINATION,
+                Coin::TEN_CENTS->cents() => self::MAX_CHANGE_COINS_PER_DENOMINATION,
+                Coin::TWENTY_FIVE_CENTS->cents() => self::MAX_CHANGE_COINS_PER_DENOMINATION,
+                Coin::ONE_EURO->cents() => self::MAX_CHANGE_COINS_PER_DENOMINATION,
+            ],
+        );
     }
 }
