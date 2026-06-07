@@ -15,15 +15,17 @@ final class ProductSelectorTest extends TestCase
         ProductSelector $selector,
         string $expectedName,
         int $expectedPriceCents,
+        int $expectedMaxStockQuantity,
     ): void {
         self::assertSame($expectedName, $selector->defaultName()->value());
         self::assertSame($expectedPriceCents, $selector->defaultPrice()->cents());
+        self::assertSame($expectedMaxStockQuantity, $selector->defaultMaxStockQuantity()->value());
     }
 
     public static function selectorsProvider(): iterable
     {
-        yield 'water' => [ProductSelector::WATER, 'Water', 65];
-        yield 'juice' => [ProductSelector::JUICE, 'Juice', 100];
-        yield 'soda' => [ProductSelector::SODA, 'Soda', 150];
+        yield 'water' => [ProductSelector::WATER, 'Water', 65, 20];
+        yield 'juice' => [ProductSelector::JUICE, 'Juice', 100, 15];
+        yield 'soda' => [ProductSelector::SODA, 'Soda', 150, 10];
     }
 }

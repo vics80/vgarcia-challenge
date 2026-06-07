@@ -12,6 +12,7 @@ use App\VgarciaChallenge\Shared\Domain\Event\DomainEvent;
 final class TestAggregateRoot extends AggregateRoot
 {
     protected const array UPDATABLE_KEYS = ['name', 'alias'];
+
     protected const array REQUIRED_KEYS = ['id', 'name'];
 
     protected ?TestLimitedStringValueObject $alias = null;

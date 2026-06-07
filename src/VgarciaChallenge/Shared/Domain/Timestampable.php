@@ -10,9 +10,11 @@ use DateTimeInterface;
 trait Timestampable
 {
     public const string CREATED_AT_KEY = 'createdAt';
+
     public const string UPDATED_AT_KEY = 'updatedAt';
 
     protected ?DateTimeInterface $createdAt = null;
+
     protected ?DateTimeInterface $updatedAt = null;
 
     public function createdAt(): ?DateTimeInterface

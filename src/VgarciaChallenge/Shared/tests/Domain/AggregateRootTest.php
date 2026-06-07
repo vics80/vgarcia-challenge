@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 final class AggregateRootTest extends TestCase
 {
     private const string FIRST_ID = '018f47d2-7c6a-7caa-b9d4-8b22f1c6d001';
+
     private const string SECOND_ID = '018f47d2-7c6a-7caa-b9d4-8b22f1c6d002';
 
     public function testCreatesFromPayloadWhenRequiredKeysArePresent(): void

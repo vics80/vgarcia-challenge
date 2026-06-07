@@ -10,6 +10,7 @@ use Ramsey\Uuid\Uuid;
 abstract class AbstractDomainEvent implements DomainEvent
 {
     private readonly string $eventId;
+
     private readonly DateTimeImmutable $occurredOn;
 
     public function __construct(

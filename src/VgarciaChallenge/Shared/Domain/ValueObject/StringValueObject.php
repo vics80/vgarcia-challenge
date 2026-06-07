@@ -14,6 +14,7 @@ use Stringable;
 class StringValueObject implements ValueObject
 {
     use ValueObjectTrait;
+
     public const ?int MAX_LENGTH = null;
 
     protected readonly string $value;
@@ -26,10 +27,8 @@ class StringValueObject implements ValueObject
 
     protected function isValid(): void
     {
-        if (null !== static::MAX_LENGTH) {
-            if (strlen($this->value()) > static::MAX_LENGTH) {
-                throw new MinMaxException();
-            }
+        if (null !== static::MAX_LENGTH && strlen($this->value()) > static::MAX_LENGTH) {
+            throw new MinMaxException();
         }
     }
 

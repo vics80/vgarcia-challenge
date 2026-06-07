@@ -7,9 +7,11 @@ namespace App\Tests\VgarciaChallenge\Vending\Domain\VendingMachine;
 use App\VgarciaChallenge\Vending\Domain\Money\Coin;
 use App\VgarciaChallenge\Vending\Domain\Money\Money;
 use App\VgarciaChallenge\Vending\Domain\Product\Exception\ProductNotFoundException;
+use App\VgarciaChallenge\Vending\Domain\Product\Exception\ProductStockLimitExceededException;
+use App\VgarciaChallenge\Vending\Domain\Product\Exception\ProductStockNotEnoughException;
 use App\VgarciaChallenge\Vending\Domain\Product\Product;
-use App\VgarciaChallenge\Vending\Domain\Product\ProductInventory;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductId;
+use App\VgarciaChallenge\Vending\Domain\Product\ProductInventory;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductSelector;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductStockQuantity;
 use App\VgarciaChallenge\Vending\Domain\VendingMachine\Event\CoinWasAdded;
@@ -214,6 +216,49 @@ final class VendingMachineTest extends TestCase
         $this->expectException(ProductNotFoundException::class);
 
         $vendingMachine->decrementProductStock(ProductSelector::WATER);
+    }
+
+    public function testChangesProductStock(): void
+    {
+        $product = $this->product(ProductSelector::WATER, 10);
+        $vendingMachine = VendingMachine::create(
+            VendingMachineId::random(),
+            Money::empty(),
+            ProductInventory::fromProducts($product),
+        );
+        $initialInventory = $vendingMachine->productInventory();
+
+        $updatedProduct = $vendingMachine->changeProductStock(ProductSelector::WATER, 5);
+
+        self::assertSame(15, $updatedProduct->stockQuantity()->value());
+        self::assertNotSame($initialInventory, $vendingMachine->productInventory());
+        self::assertSame(15, $vendingMachine->productInventory()->find(ProductSelector::WATER)?->stockQuantity()->value());
+    }
+
+    public function testFailsWhenRemovingMoreProductStockThanAvailable(): void
+    {
+        $vendingMachine = VendingMachine::create(
+            VendingMachineId::random(),
+            Money::empty(),
+            ProductInventory::fromProducts($this->product(ProductSelector::WATER, 2)),
+        );
+
+        $this->expectException(ProductStockNotEnoughException::class);
+
+        $vendingMachine->changeProductStock(ProductSelector::WATER, -3);
+    }
+
+    public function testFailsWhenAddingProductStockExceedsMaxStock(): void
+    {
+        $vendingMachine = VendingMachine::create(
+            VendingMachineId::random(),
+            Money::empty(),
+            ProductInventory::fromProducts($this->product(ProductSelector::SODA, 10)),
+        );
+
+        $this->expectException(ProductStockLimitExceededException::class);
+
+        $vendingMachine->changeProductStock(ProductSelector::SODA, 1);
     }
 
     public function testReturnsChangeAndClearsInsertedMoney(): void

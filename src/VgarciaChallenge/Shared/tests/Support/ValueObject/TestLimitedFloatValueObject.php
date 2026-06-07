@@ -9,5 +9,6 @@ use App\VgarciaChallenge\Shared\Domain\ValueObject\FloatValueObject;
 final class TestLimitedFloatValueObject extends FloatValueObject
 {
     public const ?float MAX = 10.5;
+
     public const ?float MIN = 1.5;
 }

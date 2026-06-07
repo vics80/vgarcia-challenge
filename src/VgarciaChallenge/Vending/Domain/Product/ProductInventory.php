@@ -32,7 +32,7 @@ final class ProductInventory
         return new self(...$products);
     }
 
-    /** @param list<array{productId:string,name:string,selector:string,priceCents:int,stockQuantity:int}> $products */
+    /** @param list<array{productId:string,name:string,selector:string,priceCents:int,stockQuantity:int,maxStockQuantity?:int}> $products */
     public static function fromPrimitives(array $products): self
     {
         return self::fromProducts(...array_map(
@@ -57,7 +57,7 @@ final class ProductInventory
         return array_values($this->productsBySelector);
     }
 
-    /** @return list<array{productId:string,name:string,selector:string,priceCents:int,stockQuantity:int}> */
+    /** @return list<array{productId:string,name:string,selector:string,priceCents:int,stockQuantity:int,maxStockQuantity:int}> */
     public function toPrimitives(): array
     {
         return array_map(

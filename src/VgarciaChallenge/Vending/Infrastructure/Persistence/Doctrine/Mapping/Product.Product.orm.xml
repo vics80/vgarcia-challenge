@@ -16,5 +16,6 @@
         <field name="selector" type="product_selector" column="selector" length="20"/>
         <field name="price" type="product_price" column="price_cents"/>
         <field name="stockQuantity" type="product_stock_quantity" column="stock_quantity"/>
+        <field name="maxStockQuantity" type="product_max_stock_quantity" column="max_stock_quantity"/>
     </entity>
 </doctrine-mapping>

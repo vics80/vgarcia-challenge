@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\VgarciaChallenge\Shared\Domain\ValueObject;
 
-use App\VgarciaChallenge\Shared\Domain\Specification\Exception\MinMaxException;
 use App\Tests\VgarciaChallenge\Shared\Support\ValueObject\TestLimitedStringValueObject;
 use App\Tests\VgarciaChallenge\Shared\Support\ValueObject\TestOtherLimitedStringValueObject;
 use App\Tests\VgarciaChallenge\Shared\Support\ValueObject\TestStringableValue;
+use App\VgarciaChallenge\Shared\Domain\Specification\Exception\MinMaxException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

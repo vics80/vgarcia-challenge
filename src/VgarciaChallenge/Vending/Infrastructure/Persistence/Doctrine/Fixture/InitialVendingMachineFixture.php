@@ -19,7 +19,9 @@ use Doctrine\Persistence\ObjectManager;
 final class InitialVendingMachineFixture extends Fixture
 {
     private const string VENDING_MACHINE_ID = '018f47d2-7c6a-7caa-b9d4-8b22f1c6d000';
+
     private const int INITIAL_PRODUCT_STOCK = 10;
+
     private const int INITIAL_CHANGE_COINS_PER_DENOMINATION = 10;
 
     public function load(ObjectManager $manager): void

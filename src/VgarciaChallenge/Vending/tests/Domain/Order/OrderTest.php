@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 final class OrderTest extends TestCase
 {
     private const string ORDER_ID = '018f47d2-7c6a-7caa-b9d4-8b22f1c6d201';
+
     private const string VENDING_MACHINE_ID = '018f47d2-7c6a-7caa-b9d4-8b22f1c6d000';
 
     public function testCreatesOrderAndExposesValues(): void

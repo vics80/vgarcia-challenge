@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type;
 
 use App\VgarciaChallenge\Vending\Domain\Order\OrderTotalAmount;
+use App\VgarciaChallenge\Vending\Domain\Product\ProductMaxStockQuantity;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductPrice;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductStockQuantity;
 use App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Exception\DoctrineTypeConversionException;
 use App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\OrderTotalAmountType;
+use App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\ProductMaxStockQuantityType;
 use App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\ProductPriceType;
 use App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\ProductStockQuantityType;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
@@ -74,6 +76,7 @@ final class IntegerValueObjectTypeTest extends TestCase
     public static function integerTypesProvider(): iterable
     {
         yield 'order total amount' => [new OrderTotalAmountType(), OrderTotalAmount::class];
+        yield 'product max stock quantity' => [new ProductMaxStockQuantityType(), ProductMaxStockQuantity::class];
         yield 'product price' => [new ProductPriceType(), ProductPrice::class];
         yield 'product stock quantity' => [new ProductStockQuantityType(), ProductStockQuantity::class];
     }

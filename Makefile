@@ -1,9 +1,13 @@
-.PHONY: help install up down restart logs shell composer-install composer-dump-autoload setup fixtures-load insert-coin return-coins select-product test test-one test-coverage migrate migration-diff schema-validate console
+.PHONY: help install up down restart logs shell composer-install composer-dump-autoload setup fixtures-load insert-coin return-coins select-product admin-stock test test-one test-coverage quality-tools quality-tools-dry quality-tools-fix migrate migration-diff schema-validate console
 
 DOCKER_COMPOSE := docker compose -f docker-compose.yaml
 APP_CONTAINER := vgarcia-challenge
 WORKDIR := /srv/app
 COVERAGE_DIR := var/reports/phpunit/coverage
+QUALITY_PATHS := src/VgarciaChallenge
+PHPSTAN_MEMORY_LIMIT ?= 1G
+PHPMD_EXCLUDE := '*/tests/*'
+PHPMD_PHP_FLAGS := -d 'error_reporting=E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED'
 DOCKER_EXEC := docker exec -w $(WORKDIR) $(APP_CONTAINER)
 DOCKER_EXEC_CONSOLE := docker exec -e FORCE_COLOR=1 -w $(WORKDIR) $(APP_CONTAINER)
 DOCKER_EXEC_COVERAGE := docker exec -e XDEBUG_MODE=coverage -w $(WORKDIR) $(APP_CONTAINER)
@@ -51,6 +55,11 @@ select-product: ## Select a product, for example make select-product SELECTOR=WA
 	@test -n "$(SELECTOR)" || (echo "Set SELECTOR=WATER, JUICE or SODA" && exit 1)
 	@$(CONSOLE) vending:select-product $(SELECTOR)
 
+admin-stock: ## Add/remove product stock, for example make admin-stock SELECTOR=WATER QUANTITY=5
+	@test -n "$(SELECTOR)" || (echo "Set SELECTOR=WATER, JUICE or SODA" && exit 1)
+	@test -n "$(QUANTITY)" || (echo "Set QUANTITY=5 or QUANTITY=-3" && exit 1)
+	@$(CONSOLE) vending:admin:stock $(SELECTOR) $(QUANTITY)
+
 test: ## Run the PHPUnit test suite
 	$(DOCKER_EXEC) php vendor/bin/phpunit --colors=always
 
@@ -61,6 +70,20 @@ test-one: ## Run one test file, for example make test-one TEST=src/VgarciaChalle
 test-coverage: ## Run the PHPUnit test suite with an HTML coverage report
 	$(DOCKER_EXEC_COVERAGE) php vendor/bin/phpunit --colors=always --coverage-html $(COVERAGE_DIR) --coverage-text --only-summary-for-coverage-text
 	@echo "Coverage report generated at $(COVERAGE_DIR)/index.html"
+
+quality-tools: quality-tools-dry ## Run quality tools in dry/report mode
+
+quality-tools-dry: ## Run PHPStan, PHPMD, ECS and Rector without applying changes
+	$(DOCKER_EXEC) vendor/bin/phpstan analyse --configuration=phpstan.neon --memory-limit=$(PHPSTAN_MEMORY_LIMIT)
+	$(DOCKER_EXEC) php $(PHPMD_PHP_FLAGS) vendor/bin/phpmd $(QUALITY_PATHS) text phpmd.xml --exclude $(PHPMD_EXCLUDE)
+	$(DOCKER_EXEC) vendor/bin/ecs check --config ecs.php
+	$(DOCKER_EXEC) vendor/bin/rector process --config rector.php --dry-run
+
+quality-tools-fix: ## Run quality tools and apply ECS/Rector changes
+	$(DOCKER_EXEC) vendor/bin/rector process --config rector.php
+	$(DOCKER_EXEC) vendor/bin/ecs check --config ecs.php --fix
+	$(DOCKER_EXEC) vendor/bin/phpstan analyse --configuration=phpstan.neon --memory-limit=$(PHPSTAN_MEMORY_LIMIT)
+	$(DOCKER_EXEC) php $(PHPMD_PHP_FLAGS) vendor/bin/phpmd $(QUALITY_PATHS) text phpmd.xml --exclude $(PHPMD_EXCLUDE)
 
 migrate: ## Run Doctrine migrations
 	$(CONSOLE) doctrine:migrations:migrate --no-interaction

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\VgarciaChallenge\Shared\Domain\ValueObject;
 
-use App\VgarciaChallenge\Shared\Domain\Specification\Exception\NumberMinMaxException;
 use App\Tests\VgarciaChallenge\Shared\Support\ValueObject\TestLimitedIntegerValueObject;
+use App\VgarciaChallenge\Shared\Domain\Specification\Exception\NumberMinMaxException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

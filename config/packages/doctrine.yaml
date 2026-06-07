@@ -12,6 +12,7 @@ doctrine:
             product_selector: App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\ProductSelectorType
             product_price: App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\ProductPriceType
             product_stock_quantity: App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\ProductStockQuantityType
+            product_max_stock_quantity: App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\ProductMaxStockQuantityType
             order_total_amount: App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\OrderTotalAmountType
             money: App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\MoneyType
             product_inventory: App\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine\Type\ProductInventoryType

@@ -17,7 +17,9 @@ use function json_encode;
 abstract class AggregateRoot
 {
     protected const array UPDATABLE_KEYS = [];
+
     protected const array REQUIRED_KEYS = [];
+
     public const string ID_KEY = 'id';
 
     /** @var list<DomainEvent> */
@@ -54,6 +56,7 @@ abstract class AggregateRoot
 
             $this->{$key} = $newValue;
         }
+
         $updateRepository->update($this);
     }
 
@@ -84,7 +87,6 @@ abstract class AggregateRoot
 
     final protected function getIdentifier(): ValueObject
     {
-        /* @phpstan-ignore-next-line */
         return $this->{static::ID_KEY}();
     }
 }

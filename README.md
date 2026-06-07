@@ -77,6 +77,13 @@ Select a product with:
 make select-product SELECTOR=WATER
 ```
 
+Add or remove product stock as a machine admin with:
+
+```bash
+make admin-stock SELECTOR=WATER QUANTITY=5
+make admin-stock SELECTOR=SODA QUANTITY=-3
+```
+
 Run the full PHPUnit suite with:
 
 ```bash
@@ -90,6 +97,18 @@ make test-coverage
 ```
 
 The coverage report is generated at `var/reports/phpunit/coverage/index.html`.
+
+Run code quality tools in dry/report mode with:
+
+```bash
+make quality-tools
+```
+
+Apply automatic ECS and Rector changes, then run the reporting tools with:
+
+```bash
+make quality-tools-fix
+```
 
 Run a single test file with:
 
@@ -110,8 +129,11 @@ make test-one TEST=src/VgarciaChallenge/Vending/tests/Domain/Money/MoneyTest.php
 - `make insert-coin COIN=0.25`: insert a coin into the vending machine.
 - `make return-coins`: return the inserted coins from the vending machine.
 - `make select-product SELECTOR=WATER`: select a product from the vending machine.
+- `make admin-stock SELECTOR=WATER QUANTITY=5`: add or remove product stock.
 - `make test`: run tests.
 - `make test-coverage`: run tests and generate the HTML coverage report.
+- `make quality-tools`: run PHPStan, PHPMD, ECS and Rector in dry/report mode.
+- `make quality-tools-fix`: apply ECS/Rector changes and run PHPStan/PHPMD reports.
 - `make migrate`: run Doctrine migrations.
 - `make migration-diff`: generate a Doctrine migration.
 - `make schema-validate`: validate Doctrine mapping and schema.

@@ -10,6 +10,7 @@ use App\VgarciaChallenge\Shared\Domain\UpdateRepository;
 final class RecordingUpdateRepository implements UpdateRepository
 {
     public ?AggregateRoot $aggregateRoot = null;
+
     public int $updates = 0;
 
     public function update(AggregateRoot $aggregateRoot): void

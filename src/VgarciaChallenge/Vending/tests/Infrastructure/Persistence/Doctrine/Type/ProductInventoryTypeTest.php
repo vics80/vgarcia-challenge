@@ -7,6 +7,7 @@ namespace App\Tests\VgarciaChallenge\Vending\Infrastructure\Persistence\Doctrine
 use App\VgarciaChallenge\Vending\Domain\Product\Product;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductId;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductInventory;
+use App\VgarciaChallenge\Vending\Domain\Product\ProductMaxStockQuantity;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductName;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductPrice;
 use App\VgarciaChallenge\Vending\Domain\Product\ProductSelector;
@@ -57,10 +58,11 @@ final class ProductInventoryTypeTest extends TestCase
             ProductSelector::WATER,
             ProductPrice::fromCents(65),
             new ProductStockQuantity(10),
+            new ProductMaxStockQuantity(20),
         );
     }
 
-    /** @return array{productId:string,name:string,selector:string,priceCents:int,stockQuantity:int} */
+    /** @return array{productId:string,name:string,selector:string,priceCents:int,stockQuantity:int,maxStockQuantity:int} */
     private function productPayload(): array
     {
         return [
@@ -69,6 +71,7 @@ final class ProductInventoryTypeTest extends TestCase
             'selector' => 'WATER',
             'priceCents' => 65,
             'stockQuantity' => 10,
+            'maxStockQuantity' => 20,
         ];
     }
 }

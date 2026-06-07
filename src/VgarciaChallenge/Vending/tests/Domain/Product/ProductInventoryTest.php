@@ -54,6 +54,7 @@ final class ProductInventoryTest extends TestCase
                 'selector' => 'WATER',
                 'priceCents' => 65,
                 'stockQuantity' => 10,
+                'maxStockQuantity' => 20,
             ],
             [
                 'productId' => '018f47d2-7c6a-7caa-b9d4-8b22f1c6d102',
@@ -61,6 +62,7 @@ final class ProductInventoryTest extends TestCase
                 'selector' => 'JUICE',
                 'priceCents' => 100,
                 'stockQuantity' => 9,
+                'maxStockQuantity' => 15,
             ],
         ];
 

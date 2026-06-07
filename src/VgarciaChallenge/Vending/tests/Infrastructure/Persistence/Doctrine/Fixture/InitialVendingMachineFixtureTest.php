@@ -37,8 +37,11 @@ final class InitialVendingMachineFixtureTest extends TestCase
         self::assertSame('Water', $products[0]->name()->value());
         self::assertSame(65, $products[0]->price()->cents());
         self::assertSame(10, $products[0]->stockQuantity()->value());
+        self::assertSame(20, $products[0]->maxStockQuantity()->value());
         self::assertSame(ProductSelector::JUICE, $products[1]->selector());
+        self::assertSame(15, $products[1]->maxStockQuantity()->value());
         self::assertSame(ProductSelector::SODA, $products[2]->selector());
+        self::assertSame(10, $products[2]->maxStockQuantity()->value());
 
         $vendingMachine = $persistedObjects[3];
         self::assertInstanceOf(VendingMachine::class, $vendingMachine);

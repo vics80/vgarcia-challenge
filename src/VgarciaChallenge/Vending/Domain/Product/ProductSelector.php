@@ -27,4 +27,13 @@ enum ProductSelector: string
             self::SODA => 150,
         });
     }
+
+    public function defaultMaxStockQuantity(): ProductMaxStockQuantity
+    {
+        return new ProductMaxStockQuantity(match ($this) {
+            self::WATER => 20,
+            self::JUICE => 15,
+            self::SODA => 10,
+        });
+    }
 }

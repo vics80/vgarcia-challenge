@@ -15,7 +15,9 @@ use Stringable;
 class FloatValueObject implements ValueObject
 {
     use ValueObjectTrait;
+
     public const ?float MAX = null;
+
     public const ?float MIN = null;
 
     protected readonly float $value;
@@ -28,16 +30,12 @@ class FloatValueObject implements ValueObject
 
     protected function isValid(): void
     {
-        if (null !== static::MAX) {
-            if ($this->value() > static::MAX) {
-                throw new NumberMinMaxException();
-            }
+        if (null !== static::MAX && $this->value() > static::MAX) {
+            throw new NumberMinMaxException();
         }
 
-        if (null !== static::MIN) {
-            if ($this->value() < static::MIN) {
-                throw new NumberMinMaxException();
-            }
+        if (null !== static::MIN && $this->value() < static::MIN) {
+            throw new NumberMinMaxException();
         }
     }
 

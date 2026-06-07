@@ -15,7 +15,9 @@ use Stringable;
 class IntegerValueObject implements ValueObject
 {
     use ValueObjectTrait;
+
     public const ?int MAX = null;
+
     public const ?int MIN = null;
 
     protected readonly int $value;
@@ -28,16 +30,12 @@ class IntegerValueObject implements ValueObject
 
     protected function isValid(): void
     {
-        if (null !== static::MAX) {
-            if ($this->value() > static::MAX) {
-                throw new NumberMinMaxException();
-            }
+        if (null !== static::MAX && $this->value() > static::MAX) {
+            throw new NumberMinMaxException();
         }
 
-        if (null !== static::MIN) {
-            if ($this->value() < static::MIN) {
-                throw new NumberMinMaxException();
-            }
+        if (null !== static::MIN && $this->value() < static::MIN) {
+            throw new NumberMinMaxException();
         }
     }
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\VgarciaChallenge\Shared\Domain\ValueObject;
 
-use App\VgarciaChallenge\Shared\Domain\ValueObject\Exception\InvalidUuidException;
 use App\Tests\VgarciaChallenge\Shared\Support\ValueObject\TestUuidValueObject;
+use App\VgarciaChallenge\Shared\Domain\ValueObject\Exception\InvalidUuidException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

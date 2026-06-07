@@ -122,11 +122,19 @@ class VendingMachine extends AggregateRoot
 
     public function decrementProductStock(ProductSelector $selector): void
     {
+        $this->changeProductStock($selector, -1);
+    }
+
+    public function changeProductStock(ProductSelector $selector, int $quantity): Product
+    {
         $product = $this->productForSelector($selector);
 
-        $product->decrementStock();
+        $product->changeStockBy($quantity);
+
         $this->productInventory = ProductInventory::fromPrimitives($this->productInventory->toPrimitives());
         $this->touch();
+
+        return $this->productForSelector($selector);
     }
 
     public function returnChangeAndClearInsertedMoney(Money $returnedChange): void

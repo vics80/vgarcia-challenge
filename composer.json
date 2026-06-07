@@ -22,7 +22,11 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.0",
-        "phpunit/phpunit": "^11.5"
+        "phpmd/phpmd": "^2.15",
+        "phpstan/phpstan": "^2.2",
+        "phpunit/phpunit": "^11.5",
+        "rector/rector": "^2.4",
+        "symplify/easy-coding-standard": "^13.1"
     },
     "config": {
         "allow-plugins": {
